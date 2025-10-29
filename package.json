@@ -8,9 +8,10 @@
   ],
   "scripts": {
     "dev": "turbo dev",
+    "format": "prettier --write .",
     "build": "turbo build",
     "check-types": "turbo check-types",
-    "dev:native": "turbo -F native dev",
+    "dev:app": "turbo -F web dev turbo -F server dev",
     "dev:web": "turbo -F web dev",
     "dev:server": "turbo -F server dev",
     "db:push": "turbo -F @story-brew/db db:push",
@@ -23,9 +24,10 @@
     "zod": "^4.1.11"
   },
   "devDependencies": {
-    "turbo": "^2.5.4",
+    "@types/node": "^22.13.11",
+    "prettier": "^3.6.2",
     "tsdown": "^0.15.5",
-    "@types/node": "^22.13.11"
+    "turbo": "^2.5.4"
   },
   "packageManager": "pnpm@10.8.0"
 }

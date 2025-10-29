@@ -9,18 +9,13 @@
   "orm": "drizzle",
   "backend": "hono",
   "runtime": "node",
-  "frontend": [
-    "tanstack-start"
-  ],
-  "addons": [
-    "fumadocs",
-    "turborepo"
-  ],
+  "frontend": ["tanstack-start"],
+  "addons": ["fumadocs", "turborepo"],
   "examples": [],
   "auth": "better-auth",
   "packageManager": "pnpm",
   "dbSetup": "none",
   "api": "trpc",
   "webDeploy": "wrangler",
-  "serverDeploy": "none"
+  "serverDeploy": "none",
 }

@@ -1,0 +1,24 @@
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "new-york",
+  "rsc": true,
+  "tsx": true,
+  "tailwind": {
+    "config": "",
+    "css": "styles/globals.css",
+    "baseColor": "neutral",
+    "cssVariables": true,
+    "prefix": ""
+  },
+  "iconLibrary": "lucide",
+  "aliases": {
+    "components": "@story-brew/ui/components",
+    "utils": "@story-brew/ui/lib/utils",
+    "ui": "@story-brew/ui/components/ui",
+    "lib": "@story-brew/ui/lib",
+    "hooks": "@story-brew/ui/hooks"
+  },
+  "registries": {
+    "@animate-ui": "https://animate-ui.com/r/{name}.json"
+  }
+}
