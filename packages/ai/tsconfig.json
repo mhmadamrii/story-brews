@@ -1,0 +1,17 @@
+{
+  "extends": "@story-brew/typescript-config/next.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@story-brew/*": ["../*"],
+      "@story-brew/ai/*": ["./*"]
+    }
+  },
+  "include": ["**/*.ts", "**/*.tsx"],
+  "exclude": ["node_modules"]
+}

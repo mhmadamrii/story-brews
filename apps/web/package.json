@@ -36,7 +36,8 @@
     "better-auth": "catalog:",
     "@story-brew/api": "workspace:*",
     "@story-brew/auth": "workspace:*",
-    "@story-brew/ui": "workspace:*"
+    "@story-brew/ui": "workspace:*",
+    "@story-brew/ai": "workspace:*"
   },
   "devDependencies": {
     "@tanstack/react-router-devtools": "^1.132.31",

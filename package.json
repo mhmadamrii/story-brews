@@ -2,11 +2,7 @@
   "name": "story-brew",
   "private": true,
   "type": "module",
-  "workspaces": [
-    "apps/*",
-    "packages/*",
-    "cli"
-  ],
+  "workspaces": ["apps/*", "packages/*", "cli"],
   "scripts": {
     "dev": "turbo dev",
     "format": "prettier --write .",
@@ -14,6 +10,7 @@
     "check-types": "turbo check-types",
     "dev:web": "turbo -F web dev",
     "dev:server": "turbo -F server dev",
+    "dev:app": "turbo run dev --filter=web --filter=server",
     "db:push": "turbo -F @story-brew/db db:push",
     "db:studio": "turbo -F @story-brew/db db:studio",
     "db:generate": "turbo -F @story-brew/db db:generate",

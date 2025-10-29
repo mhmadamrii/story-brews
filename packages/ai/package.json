@@ -1,0 +1,28 @@
+{
+  "name": "@story-brew/ai",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "clean": "git clean -xdf .cache .turbo dist node_modules",
+    "typecheck": "tsc --noEmit --emitDeclarationOnly false",
+    "build": "tsdown"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./src/index.ts"
+    },
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "default": "./src/*.ts"
+    }
+  },
+  "dependencies": {
+    "groq-sdk": "^0.34.0"
+  },
+  "devDependencies": {
+    "tsdown": "catalog:",
+    "typescript": "^5.0.0",
+    "@story-brew/typescript-config": "workspace:*"
+  }
+}
