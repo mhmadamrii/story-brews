@@ -1,25 +1,80 @@
-import {Args, Command, Flags} from '@oclif/core'
+import prompts from 'prompts'
+import fs from 'fs'
+import path from 'path'
 
+import { Command } from '@oclif/core'
 export default class PackageGenerate extends Command {
-  static override args = {
-    file: Args.string({description: 'file to read'}),
-  }
-  static override description = 'describe the command here'
-  static override examples = ['<%= config.bin %> <%= command.id %>']
-  static override flags = {
-    // flag with no value (-f, --force)
-    force: Flags.boolean({char: 'f'}),
-    // flag with a value (-n, --name=VALUE)
-    name: Flags.string({char: 'n', description: 'name to print'}),
-  }
+  static override description = 'Generate a new package inside the monorepo (packages/<name>)'
 
-  public async run(): Promise<void> {
-    const {args, flags} = await this.parse(PackageGenerate)
+  async run(): Promise<void> {
+    this.log('🧩 Story Brews Package Generator\n')
 
-    const name = flags.name ?? 'world'
-    this.log(`hello ${name} from /Users/amri/dev/web/story-brew/apps/cli/src/commands/package/generate.ts`)
-    if (args.file && flags.force) {
-      this.log(`you input --force and --file: ${args.file}`)
+    const response = await prompts([
+      {
+        type: 'text',
+        name: 'name',
+        message: 'What is the name of the new package?',
+        validate: (value: string) => value.trim() !== '' || 'Package name is required',
+      },
+      {
+        type: 'text',
+        name: 'description',
+        message: 'Short description:',
+      },
+    ])
+
+    const pkgName = response.name.trim()
+    const pkgDir = path.resolve(process.cwd(), '../../packages', pkgName)
+
+    if (fs.existsSync(pkgDir)) {
+      this.error(`❌ Package "${pkgName}" already exists at ${pkgDir}`)
+      return
     }
+
+    // Create directories
+    fs.mkdirSync(path.join(pkgDir, 'src'), { recursive: true })
+
+    // Create package.json
+    const pkgJson = {
+      name: `@story-brew/${pkgName}`,
+      version: '0.1.0',
+      description: response.description || '',
+      main: 'dist/index.js',
+      types: 'dist/index.d.ts',
+      scripts: {
+        build: 'tsc -p tsconfig.json',
+      },
+    }
+
+    fs.writeFileSync(path.join(pkgDir, 'package.json'), JSON.stringify(pkgJson, null, 2), 'utf8')
+
+    // Create tsconfig.json
+    const tsConfig = {
+      compilerOptions: {
+        target: 'ES2020',
+        module: 'CommonJS',
+        declaration: true,
+        outDir: 'dist',
+        rootDir: 'src',
+        strict: true,
+        esModuleInterop: true,
+      },
+      include: ['src'],
+    }
+
+    fs.writeFileSync(path.join(pkgDir, 'tsconfig.json'), JSON.stringify(tsConfig, null, 2), 'utf8')
+
+    // Create basic source file
+    const safeExport = pkgName.replace(/[^a-zA-Z0-9_]/g, '_')
+    fs.writeFileSync(
+      path.join(pkgDir, 'src', 'index.ts'),
+      `export const ${safeExport} = () => {
+  console.log('Hello from ${pkgName}!');
+}\n`,
+      'utf8'
+    )
+
+    this.log(`✅ Package "${pkgName}" created successfully!`)
+    this.log(`📁 Location: packages/${pkgName}`)
   }
 }

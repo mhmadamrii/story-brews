@@ -2,7 +2,10 @@
   "name": "story-brew",
   "private": true,
   "type": "module",
-  "workspaces": ["apps/*", "packages/*", "cli"],
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "dev": "turbo dev",
     "format": "prettier --write .",
@@ -16,7 +19,7 @@
     "db:generate": "turbo -F @story-brew/db db:generate",
     "db:migrate": "turbo -F @story-brew/db db:migrate",
     "prepackage": "pnpm -F cli build",
-    "package": "pnpm -F cli start"
+    "package:generate": "node apps/cli/bin/run.js package:generate"
   },
   "dependencies": {
     "dotenv": "^17.2.2",

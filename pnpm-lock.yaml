@@ -88,6 +88,9 @@ importers:
       '@types/node':
         specifier: ^18
         version: 18.19.130
+      '@types/prompts':
+        specifier: ^2.4.9
+        version: 2.4.9
       chai:
         specifier: ^4
         version: 4.5.0
@@ -3715,6 +3718,9 @@ packages:
 
   '@types/pg@8.15.6':
     resolution: {integrity: sha512-NoaMtzhxOrubeL/7UZuNTrejB4MPAJ0RpxZqXQf2qXuVlTPuG6Y8p4u9dKRaue4yjmC7ZhzVO2/Yyyn25znrPQ==}
+
+  '@types/prompts@2.4.9':
+    resolution: {integrity: sha512-qTxFi6Buiu8+50/+3DGIWLHM6QuWsEKugJnnP6iv2Mc4ncxE4A/OJkjuVOA+5X0X1S/nq5VJRa8Lu+nwcvbrKA==}
 
   '@types/react-dom@19.2.2':
     resolution: {integrity: sha512-9KQPoO6mZCi7jcIStSnlOWn2nEF3mNmyr3rIAsGnAbQKYbRLyqmeSc39EVgtxXVia+LMT8j3knZLAZAh+xLmrw==}
@@ -12512,6 +12518,11 @@ snapshots:
       '@types/node': 22.18.13
       pg-protocol: 1.10.3
       pg-types: 2.2.0
+
+  '@types/prompts@2.4.9':
+    dependencies:
+      '@types/node': 22.18.13
+      kleur: 3.0.3
 
   '@types/react-dom@19.2.2(@types/react@19.1.17)':
     dependencies:
