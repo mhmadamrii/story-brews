@@ -4,7 +4,7 @@ import { useTRPC } from '@/utils/trpc'
 import { Button } from '@story-brew/ui/components/ui/button'
 import { getGroqChatCompletion } from '@story-brew/ai'
 
-export const Route = createFileRoute('/')({
+export const Route = createFileRoute('/(public)/')({
   component: HomeComponent,
 })
 

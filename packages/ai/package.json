@@ -18,11 +18,12 @@
     }
   },
   "dependencies": {
+    "dotenv": "catalog:",
     "groq-sdk": "^0.34.0"
   },
   "devDependencies": {
+    "@story-brew/typescript-config": "workspace:*",
     "tsdown": "catalog:",
-    "typescript": "^5.0.0",
-    "@story-brew/typescript-config": "workspace:*"
+    "typescript": "^5.0.0"
   }
 }

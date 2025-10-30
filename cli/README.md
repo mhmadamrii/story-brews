@@ -20,3 +20,5 @@ packages/
     └── src/
         └── index.ts
 ```
+
+I want to create an application that can generates a full story based on blocked ideas or a piece of text that created daily or section by section. so the base idea is it will help people for those who are not expert in creating stories and hard to explain something. so there will be an input field that create the story section idea and then after user creating 5 or more ideas the is a button to create a story, help me to create commponent using react typescript and shadcnui, the generator comes from groq ai and we will setup later on

@@ -11,7 +11,11 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as DashboardRouteImport } from './routes/dashboard'
-import { Route as IndexRouteImport } from './routes/index'
+import { Route as mainRouteRouteImport } from './routes/(main)/route'
+import { Route as publicIndexRouteImport } from './routes/(public)/index'
+import { Route as publicAboutIndexRouteImport } from './routes/(public)/about/index'
+import { Route as mainMyStoriesIndexRouteImport } from './routes/(main)/my-stories/index'
+import { Route as mainHomeIndexRouteImport } from './routes/(main)/home/index'
 
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
@@ -23,40 +27,79 @@ const DashboardRoute = DashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
+const mainRouteRoute = mainRouteRouteImport.update({
+  id: '/(main)',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const publicIndexRoute = publicIndexRouteImport.update({
+  id: '/(public)/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const publicAboutIndexRoute = publicAboutIndexRouteImport.update({
+  id: '/(public)/about/',
+  path: '/about/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const mainMyStoriesIndexRoute = mainMyStoriesIndexRouteImport.update({
+  id: '/my-stories/',
+  path: '/my-stories/',
+  getParentRoute: () => mainRouteRoute,
+} as any)
+const mainHomeIndexRoute = mainHomeIndexRouteImport.update({
+  id: '/home/',
+  path: '/home/',
+  getParentRoute: () => mainRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
+  '/': typeof publicIndexRoute
+  '/home': typeof mainHomeIndexRoute
+  '/my-stories': typeof mainMyStoriesIndexRoute
+  '/about': typeof publicAboutIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
+  '/': typeof publicIndexRoute
+  '/home': typeof mainHomeIndexRoute
+  '/my-stories': typeof mainMyStoriesIndexRoute
+  '/about': typeof publicAboutIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
+  '/(main)': typeof mainRouteRouteWithChildren
   '/dashboard': typeof DashboardRoute
   '/login': typeof LoginRoute
+  '/(public)/': typeof publicIndexRoute
+  '/(main)/home/': typeof mainHomeIndexRoute
+  '/(main)/my-stories/': typeof mainMyStoriesIndexRoute
+  '/(public)/about/': typeof publicAboutIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard' | '/login'
+  fullPaths: '/dashboard' | '/login' | '/' | '/home' | '/my-stories' | '/about'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard' | '/login'
-  id: '__root__' | '/' | '/dashboard' | '/login'
+  to: '/dashboard' | '/login' | '/' | '/home' | '/my-stories' | '/about'
+  id:
+    | '__root__'
+    | '/(main)'
+    | '/dashboard'
+    | '/login'
+    | '/(public)/'
+    | '/(main)/home/'
+    | '/(main)/my-stories/'
+    | '/(public)/about/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
+  mainRouteRoute: typeof mainRouteRouteWithChildren
   DashboardRoute: typeof DashboardRoute
   LoginRoute: typeof LoginRoute
+  publicIndexRoute: typeof publicIndexRoute
+  publicAboutIndexRoute: typeof publicAboutIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -75,20 +118,64 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
+    '/(main)': {
+      id: '/(main)'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof mainRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(public)/': {
+      id: '/(public)/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+      preLoaderRoute: typeof publicIndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/(public)/about/': {
+      id: '/(public)/about/'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof publicAboutIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(main)/my-stories/': {
+      id: '/(main)/my-stories/'
+      path: '/my-stories'
+      fullPath: '/my-stories'
+      preLoaderRoute: typeof mainMyStoriesIndexRouteImport
+      parentRoute: typeof mainRouteRoute
+    }
+    '/(main)/home/': {
+      id: '/(main)/home/'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof mainHomeIndexRouteImport
+      parentRoute: typeof mainRouteRoute
     }
   }
 }
 
+interface mainRouteRouteChildren {
+  mainHomeIndexRoute: typeof mainHomeIndexRoute
+  mainMyStoriesIndexRoute: typeof mainMyStoriesIndexRoute
+}
+
+const mainRouteRouteChildren: mainRouteRouteChildren = {
+  mainHomeIndexRoute: mainHomeIndexRoute,
+  mainMyStoriesIndexRoute: mainMyStoriesIndexRoute,
+}
+
+const mainRouteRouteWithChildren = mainRouteRoute._addFileChildren(
+  mainRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
+  mainRouteRoute: mainRouteRouteWithChildren,
   DashboardRoute: DashboardRoute,
   LoginRoute: LoginRoute,
+  publicIndexRoute: publicIndexRoute,
+  publicAboutIndexRoute: publicAboutIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
