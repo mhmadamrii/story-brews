@@ -10,6 +10,18 @@ export const storyRouter = {
   getAllMyStoryBlocks: protectedProcedure.query(({ ctx }) => {
     return db.select().from(storyBlocks).where(eq(storyBlocks.userId, ctx.session.user.id))
   }),
+  deleteStoryBlock: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .mutation(({ input }) => {
+      return db
+        .delete(storyBlocks)
+        .where(eq(storyBlocks.id, input.id))
+        .returning({ id: storyBlocks.id })
+    }),
   createStoryBlock: protectedProcedure
     .input(
       z.object({
@@ -19,7 +31,6 @@ export const storyRouter = {
     )
     .mutation(({ ctx, input }) => {
       const { content, order } = input
-
       return db
         .insert(storyBlocks)
         .values({

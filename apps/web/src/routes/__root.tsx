@@ -1,5 +1,9 @@
-import { Toaster } from '@/components/ui/sonner'
+import Header from '../components/header'
+import appCss from '../index.css?url'
+import Loader from '@/components/loader'
 
+import { Toaster } from '@/components/ui/sonner'
+import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 import {
@@ -9,12 +13,8 @@ import {
   createRootRouteWithContext,
   useRouterState,
 } from '@tanstack/react-router'
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
-import Header from '../components/header'
-import appCss from '../index.css?url'
-import type { QueryClient } from '@tanstack/react-query'
-import Loader from '@/components/loader'
 
+import type { QueryClient } from '@tanstack/react-query'
 import type { TRPCOptionsProxy } from '@trpc/tanstack-react-query'
 import type { AppRouter } from '@story-brew/api/routers/index'
 export interface RouterAppContext {

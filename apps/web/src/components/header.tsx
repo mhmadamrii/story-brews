@@ -1,15 +1,16 @@
-import { Link } from '@tanstack/react-router'
 import UserMenu from './user-menu'
+
+import { Link } from '@tanstack/react-router'
 
 export default function Header() {
   const links = [
     {
       to: '/',
-      label: 'Home',
+      label: 'Landing page',
     },
     {
-      to: '/dashboard',
-      label: 'Dashboard',
+      to: '/home',
+      label: 'Home',
     },
   ] as const
 

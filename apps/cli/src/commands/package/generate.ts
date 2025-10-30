@@ -1,13 +1,24 @@
 import prompts from 'prompts'
 import fs from 'fs'
 import path from 'path'
+import chalk from 'chalk'
+import figlet from 'figlet'
 
 import { Command } from '@oclif/core'
 export default class PackageGenerate extends Command {
   static override description = 'Generate a new package inside the monorepo (packages/<name>)'
 
   async run(): Promise<void> {
-    this.log('🧩 Story Brews Package Generator\n')
+    this.log(
+      chalk.cyan(
+        figlet.textSync('Story Brews', {
+          horizontalLayout: 'default',
+          verticalLayout: 'default',
+        })
+      )
+    )
+
+    this.log(chalk.green('🧩 Story Brews Package Generator\n'))
 
     const response = await prompts([
       {
@@ -24,17 +35,16 @@ export default class PackageGenerate extends Command {
     ])
 
     const pkgName = response.name.trim()
-    const pkgDir = path.resolve(process.cwd(), '../../packages', pkgName)
+    const pkgDir = path.resolve(process.cwd(), './packages', pkgName)
 
     if (fs.existsSync(pkgDir)) {
+      console.log('pkgDir', pkgDir)
       this.error(`❌ Package "${pkgName}" already exists at ${pkgDir}`)
       return
     }
 
-    // Create directories
     fs.mkdirSync(path.join(pkgDir, 'src'), { recursive: true })
 
-    // Create package.json
     const pkgJson = {
       name: `@story-brew/${pkgName}`,
       version: '0.1.0',
