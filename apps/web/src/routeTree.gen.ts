@@ -13,6 +13,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as mainRouteRouteImport } from './routes/(main)/route'
 import { Route as publicIndexRouteImport } from './routes/(public)/index'
+import { Route as publicMotionIndexRouteImport } from './routes/(public)/motion/index'
 import { Route as publicAboutIndexRouteImport } from './routes/(public)/about/index'
 import { Route as mainMyStoriesIndexRouteImport } from './routes/(main)/my-stories/index'
 import { Route as mainHomeIndexRouteImport } from './routes/(main)/home/index'
@@ -34,6 +35,11 @@ const mainRouteRoute = mainRouteRouteImport.update({
 const publicIndexRoute = publicIndexRouteImport.update({
   id: '/(public)/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const publicMotionIndexRoute = publicMotionIndexRouteImport.update({
+  id: '/(public)/motion/',
+  path: '/motion/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const publicAboutIndexRoute = publicAboutIndexRouteImport.update({
@@ -59,6 +65,7 @@ export interface FileRoutesByFullPath {
   '/home': typeof mainHomeIndexRoute
   '/my-stories': typeof mainMyStoriesIndexRoute
   '/about': typeof publicAboutIndexRoute
+  '/motion': typeof publicMotionIndexRoute
 }
 export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
@@ -67,6 +74,7 @@ export interface FileRoutesByTo {
   '/home': typeof mainHomeIndexRoute
   '/my-stories': typeof mainMyStoriesIndexRoute
   '/about': typeof publicAboutIndexRoute
+  '/motion': typeof publicMotionIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -77,12 +85,27 @@ export interface FileRoutesById {
   '/(main)/home/': typeof mainHomeIndexRoute
   '/(main)/my-stories/': typeof mainMyStoriesIndexRoute
   '/(public)/about/': typeof publicAboutIndexRoute
+  '/(public)/motion/': typeof publicMotionIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/dashboard' | '/login' | '/' | '/home' | '/my-stories' | '/about'
+  fullPaths:
+    | '/dashboard'
+    | '/login'
+    | '/'
+    | '/home'
+    | '/my-stories'
+    | '/about'
+    | '/motion'
   fileRoutesByTo: FileRoutesByTo
-  to: '/dashboard' | '/login' | '/' | '/home' | '/my-stories' | '/about'
+  to:
+    | '/dashboard'
+    | '/login'
+    | '/'
+    | '/home'
+    | '/my-stories'
+    | '/about'
+    | '/motion'
   id:
     | '__root__'
     | '/(main)'
@@ -92,6 +115,7 @@ export interface FileRouteTypes {
     | '/(main)/home/'
     | '/(main)/my-stories/'
     | '/(public)/about/'
+    | '/(public)/motion/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -100,6 +124,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   publicIndexRoute: typeof publicIndexRoute
   publicAboutIndexRoute: typeof publicAboutIndexRoute
+  publicMotionIndexRoute: typeof publicMotionIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -130,6 +155,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof publicIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(public)/motion/': {
+      id: '/(public)/motion/'
+      path: '/motion'
+      fullPath: '/motion'
+      preLoaderRoute: typeof publicMotionIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(public)/about/': {
@@ -176,6 +208,7 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   publicIndexRoute: publicIndexRoute,
   publicAboutIndexRoute: publicAboutIndexRoute,
+  publicMotionIndexRoute: publicMotionIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

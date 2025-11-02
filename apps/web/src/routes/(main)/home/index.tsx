@@ -13,10 +13,19 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
 } from '@story-brew/ui/components/ui/dialog'
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@story-brew/ui/components/ui/select'
 
 const STORY_CATEGORY = [
   {
@@ -127,27 +136,36 @@ function GenerateDialog({
   piecesOfStories: string[] | undefined
 }) {
   const customPrompt = useRef<HTMLTextAreaElement | null>(null)
-  const [selectedCategory, setSelectedCategory] = useState(0)
+  const storyRef = useRef<HTMLTextAreaElement | null>(null)
 
-  console.log('STORY_CATEGORY[selectedCategory]', STORY_CATEGORY[selectedCategory])
+  const [selectedCategory, setSelectedCategory] = useState(0)
+  const [lang, setLang] = useState<'en' | 'id'>('en')
+
+  console.log('selectedCategory', selectedCategory)
+  console.log('STORY_CATEGORY[selectedCategory]', STORY_CATEGORY[selectedCategory - 1])
 
   const handleGenerate = async () => {
     const res = await generateStoryWithAI({
       category: STORY_CATEGORY[selectedCategory].name,
       customPrompt: customPrompt.current?.value,
       storyBlocks: piecesOfStories || [],
+      lang,
     })
     console.log('response generation', res)
+
+    if (res && storyRef.current) {
+      storyRef.current.value = res
+    }
   }
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger>Open</DialogTrigger>
-      <DialogContent>
+      <DialogContent className="w-full sm:max-w-4xl max-h-full sm:max-h-2xl">
         <DialogHeader>
           <DialogTitle>Generate a new story</DialogTitle>
-          <DialogDescription>
-            <div className="w-full flex flex-col gap-2">
+          <DialogDescription>Create a new story with AI</DialogDescription>
+          <div className="w-full flex gap-3">
+            <div className="w-full sm:w-1/2 flex flex-col gap-2">
               <div className="flex gap-2 flex-wrap">
                 {STORY_CATEGORY.map((item) => (
                   <div
@@ -164,16 +182,34 @@ function GenerateDialog({
                   </div>
                 ))}
               </div>
-
-              <div className="w-full flex flex-col gap-2">
+              <div className="w-full flex flex-col gap-4">
+                <Select onValueChange={(value) => setLang(value as 'en' | 'id')}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Language" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="en">English</SelectItem>
+                    <SelectItem value="id">Indonesia</SelectItem>
+                  </SelectContent>
+                </Select>
                 <Textarea ref={customPrompt} className="w-full" />
                 <Button onClick={handleGenerate} className="w-full cursor-pointer">
                   Generate
                 </Button>
               </div>
             </div>
-          </DialogDescription>
+            <div className="w-full sm:w-1/2 h-full flex flex-col gap-3">
+              <h1>Generated Story</h1>
+              <Textarea ref={storyRef} className="w-full h-[400px]" />
+            </div>
+          </div>
         </DialogHeader>
+        <DialogFooter>
+          <Button variant="secondary" onClick={() => setIsOpen(false)}>
+            Close
+          </Button>
+          <Button onClick={() => setIsOpen(false)}>Publish</Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   )

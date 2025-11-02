@@ -12,6 +12,10 @@ export default function Header() {
       to: '/home',
       label: 'Home',
     },
+    {
+      to: '/motion',
+      label: 'motion',
+    },
   ] as const
 
   return (
