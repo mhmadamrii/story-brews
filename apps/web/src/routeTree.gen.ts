@@ -9,25 +9,14 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as mainRouteRouteImport } from './routes/(main)/route'
 import { Route as publicIndexRouteImport } from './routes/(public)/index'
 import { Route as publicMotionIndexRouteImport } from './routes/(public)/motion/index'
+import { Route as publicLoginIndexRouteImport } from './routes/(public)/login/index'
 import { Route as publicAboutIndexRouteImport } from './routes/(public)/about/index'
 import { Route as mainMyStoriesIndexRouteImport } from './routes/(main)/my-stories/index'
 import { Route as mainHomeIndexRouteImport } from './routes/(main)/home/index'
 
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardRoute = DashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const mainRouteRoute = mainRouteRouteImport.update({
   id: '/(main)',
   getParentRoute: () => rootRouteImport,
@@ -40,6 +29,11 @@ const publicIndexRoute = publicIndexRouteImport.update({
 const publicMotionIndexRoute = publicMotionIndexRouteImport.update({
   id: '/(public)/motion/',
   path: '/motion/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const publicLoginIndexRoute = publicLoginIndexRouteImport.update({
+  id: '/(public)/login/',
+  path: '/login/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const publicAboutIndexRoute = publicAboutIndexRouteImport.update({
@@ -59,90 +53,57 @@ const mainHomeIndexRoute = mainHomeIndexRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/dashboard': typeof DashboardRoute
-  '/login': typeof LoginRoute
   '/': typeof publicIndexRoute
   '/home': typeof mainHomeIndexRoute
   '/my-stories': typeof mainMyStoriesIndexRoute
   '/about': typeof publicAboutIndexRoute
+  '/login': typeof publicLoginIndexRoute
   '/motion': typeof publicMotionIndexRoute
 }
 export interface FileRoutesByTo {
-  '/dashboard': typeof DashboardRoute
-  '/login': typeof LoginRoute
   '/': typeof publicIndexRoute
   '/home': typeof mainHomeIndexRoute
   '/my-stories': typeof mainMyStoriesIndexRoute
   '/about': typeof publicAboutIndexRoute
+  '/login': typeof publicLoginIndexRoute
   '/motion': typeof publicMotionIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/(main)': typeof mainRouteRouteWithChildren
-  '/dashboard': typeof DashboardRoute
-  '/login': typeof LoginRoute
   '/(public)/': typeof publicIndexRoute
   '/(main)/home/': typeof mainHomeIndexRoute
   '/(main)/my-stories/': typeof mainMyStoriesIndexRoute
   '/(public)/about/': typeof publicAboutIndexRoute
+  '/(public)/login/': typeof publicLoginIndexRoute
   '/(public)/motion/': typeof publicMotionIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/dashboard'
-    | '/login'
-    | '/'
-    | '/home'
-    | '/my-stories'
-    | '/about'
-    | '/motion'
+  fullPaths: '/' | '/home' | '/my-stories' | '/about' | '/login' | '/motion'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/dashboard'
-    | '/login'
-    | '/'
-    | '/home'
-    | '/my-stories'
-    | '/about'
-    | '/motion'
+  to: '/' | '/home' | '/my-stories' | '/about' | '/login' | '/motion'
   id:
     | '__root__'
     | '/(main)'
-    | '/dashboard'
-    | '/login'
     | '/(public)/'
     | '/(main)/home/'
     | '/(main)/my-stories/'
     | '/(public)/about/'
+    | '/(public)/login/'
     | '/(public)/motion/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   mainRouteRoute: typeof mainRouteRouteWithChildren
-  DashboardRoute: typeof DashboardRoute
-  LoginRoute: typeof LoginRoute
   publicIndexRoute: typeof publicIndexRoute
   publicAboutIndexRoute: typeof publicAboutIndexRoute
+  publicLoginIndexRoute: typeof publicLoginIndexRoute
   publicMotionIndexRoute: typeof publicMotionIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/(main)': {
       id: '/(main)'
       path: ''
@@ -162,6 +123,13 @@ declare module '@tanstack/react-router' {
       path: '/motion'
       fullPath: '/motion'
       preLoaderRoute: typeof publicMotionIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(public)/login/': {
+      id: '/(public)/login/'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof publicLoginIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(public)/about/': {
@@ -204,10 +172,9 @@ const mainRouteRouteWithChildren = mainRouteRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   mainRouteRoute: mainRouteRouteWithChildren,
-  DashboardRoute: DashboardRoute,
-  LoginRoute: LoginRoute,
   publicIndexRoute: publicIndexRoute,
   publicAboutIndexRoute: publicAboutIndexRoute,
+  publicLoginIndexRoute: publicLoginIndexRoute,
   publicMotionIndexRoute: publicMotionIndexRoute,
 }
 export const routeTree = rootRouteImport

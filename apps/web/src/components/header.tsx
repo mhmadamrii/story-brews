@@ -16,6 +16,10 @@ export default function Header() {
       to: '/motion',
       label: 'motion',
     },
+    {
+      to: '/my-stories',
+      label: 'My Stories',
+    },
   ] as const
 
   return (

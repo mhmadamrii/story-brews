@@ -1,7 +1,8 @@
+import z from 'zod'
+
 import { db, eq } from '@story-brew/db'
 import { stories, storyBlocks } from '@story-brew/db/schema/story'
 import { protectedProcedure } from '..'
-import z from 'zod'
 
 export const storyRouter = {
   getAllMyStories: protectedProcedure.query(({ ctx }) => {
@@ -22,6 +23,9 @@ export const storyRouter = {
         .where(eq(storyBlocks.id, input.id))
         .returning({ id: storyBlocks.id })
     }),
+  deleteStory: protectedProcedure.input(z.object({ id: z.string() })).mutation(({ input }) => {
+    return db.delete(stories).where(eq(stories.id, input.id)).returning({ id: stories.id })
+  }),
   createStoryBlock: protectedProcedure
     .input(
       z.object({
@@ -39,5 +43,17 @@ export const storyRouter = {
           userId: ctx.session.user.id,
         })
         .returning()
+    }),
+  createWholeStore: protectedProcedure
+    .input(z.object({ title: z.string(), content: z.string() }))
+    .mutation(({ input, ctx }) => {
+      return db
+        .insert(stories)
+        .values({
+          content: input.content,
+          userId: ctx.session.user.id,
+          title: input.title,
+        })
+        .returning({ id: stories.id })
     }),
 }

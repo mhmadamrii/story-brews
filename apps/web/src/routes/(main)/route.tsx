@@ -1,5 +1,6 @@
 import { getUser } from '@/functions/get-user'
-import { createFileRoute, Outlet, useRouterState } from '@tanstack/react-router'
+import { createFileRoute, Outlet, redirect, useRouterState } from '@tanstack/react-router'
+import { Loader } from 'lucide-react'
 
 export const Route = createFileRoute('/(main)')({
   component: RouteComponent,
@@ -7,15 +8,17 @@ export const Route = createFileRoute('/(main)')({
     const session = await getUser()
     return { session }
   },
+  loader: async ({ context }) => {
+    if (!context.session) {
+      throw redirect({
+        to: '/login',
+      })
+    }
+  },
 })
 
 function RouteComponent() {
   const isLoading = useRouterState({ select: (s) => s.isLoading })
 
-  console.log(isLoading)
-  return (
-    <main>
-      <Outlet />
-    </main>
-  )
+  return <main>{isLoading ? <Loader className="animate-spin" /> : <Outlet />}</main>
 }

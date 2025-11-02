@@ -1,44 +1,36 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useQuery } from '@tanstack/react-query'
 import { useTRPC } from '@/utils/trpc'
-import { Button } from '@story-brew/ui/components/ui/button'
-import { getGroqChatCompletion } from '@story-brew/ai'
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@story-brew/ui/components/ui/card'
 
 export const Route = createFileRoute('/(public)/')({
   component: HomeComponent,
 })
 
 function HomeComponent() {
-  const trpc = useTRPC()
-  const healthCheck = useQuery(trpc.healthCheck.queryOptions())
-
-  const handleCompletion = async () => {
-    const res = await getGroqChatCompletion()
-    console.log(res)
-  }
-
   return (
-    <div className="container mx-auto max-w-3xl px-4 py-2">
-      <Button className="cursor-pointer" onClick={handleCompletion}>
-        Hello world
-      </Button>
-      <div className="grid gap-6">
-        <section className="rounded-lg border p-4">
-          <h2 className="mb-2 font-medium">API Status</h2>
-          <div className="flex items-center gap-2">
-            <div
-              className={`h-2 w-2 rounded-full ${healthCheck.data ? 'bg-green-500' : 'bg-red-500'}`}
-            />
-            <span className="text-muted-foreground text-sm">
-              {healthCheck.isLoading
-                ? 'Checking...'
-                : healthCheck.data
-                  ? 'Connected'
-                  : 'Disconnected'}
-            </span>
-          </div>
-        </section>
-      </div>
+    <div className="container mx-auto px-4 border border-red-500 py-2 flex gap-2 flex-wrap">
+      {Array.from({ length: 10 }).map((_, idx) => (
+        <Card key={idx}>
+          <CardHeader>
+            <CardTitle>Card Title</CardTitle>
+            <CardDescription>Card Description</CardDescription>
+          </CardHeader>
+          <CardContent className="w-full sm:w-[200px]">
+            <p>Card Content</p>
+          </CardContent>
+          <CardFooter>
+            <p>Card Footer</p>
+          </CardFooter>
+        </Card>
+      ))}
     </div>
   )
 }
