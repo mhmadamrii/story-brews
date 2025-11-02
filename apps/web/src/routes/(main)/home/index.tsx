@@ -50,6 +50,14 @@ const STORY_CATEGORY = [
     id: 5,
     name: 'Science Fiction',
   },
+  {
+    id: 6,
+    name: 'Sport',
+  },
+  {
+    id: 7,
+    name: 'Romance',
+  },
 ]
 
 export const Route = createFileRoute('/(main)/home/')({
@@ -152,12 +160,10 @@ function GenerateDialog({
     })
   )
 
-  console.log('selectedCategory', selectedCategory)
-  console.log('STORY_CATEGORY[selectedCategory]', STORY_CATEGORY[selectedCategory - 1])
-
   const handleGenerate = async () => {
+    console.log('aleez', STORY_CATEGORY[selectedCategory]?.name)
     const res = await generateStoryWithAI({
-      category: STORY_CATEGORY[selectedCategory].name,
+      category: STORY_CATEGORY[selectedCategory - 1].name,
       customPrompt: customPrompt.current?.value,
       storyBlocks: piecesOfStories || [],
       lang,
