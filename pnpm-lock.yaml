@@ -452,6 +452,8 @@ importers:
         specifier: 'catalog:'
         version: 0.15.11(typescript@5.9.3)
 
+  packages/editor: {}
+
   packages/typescript-config: {}
 
   packages/ui:

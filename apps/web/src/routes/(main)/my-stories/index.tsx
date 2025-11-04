@@ -36,14 +36,14 @@ function RouteComponent() {
   return (
     <div className="mx-auto container">
       <h1>My Stories</h1>
-      <div className="flex-col flex gap-2">
+      <div className="grid grid-cols-5 grid-rows-5 gap-4">
         {myStories?.map((item) => (
-          <Card key={item.id}>
+          <Card className="col-span-2" key={item.id}>
             <CardHeader>
               <CardTitle>{item.title}</CardTitle>
               <CardDescription>Card Description</CardDescription>
             </CardHeader>
-            <CardContent className="w-full sm:w-[200px]">{item.content}</CardContent>
+            <CardContent className="w-full">{item.content}</CardContent>
             <CardFooter>
               <Button
                 className="cursor-pointer"

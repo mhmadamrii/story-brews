@@ -13,10 +13,6 @@ export default function Header() {
       label: 'Home',
     },
     {
-      to: '/motion',
-      label: 'motion',
-    },
-    {
       to: '/my-stories',
       label: 'My Stories',
     },

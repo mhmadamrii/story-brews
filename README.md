@@ -72,3 +72,56 @@ story-brew/
 - `pnpm check-types`: Check TypeScript types across all apps
 - `pnpm db:push`: Push schema changes to database
 - `pnpm db:studio`: Open database studio UI
+
+Create a clean, modern mobile app UI for an AI storytelling platform.
+
+The app allows users to:
+
+- Input short story blocks (like “drink a coffee”, “coding”, “Thursday”)
+- Generate a short story (under 400 characters)
+- Publish and share it
+- Explore other users’ stories
+- Like stories
+- View their own published stories
+
+Include the following screens:
+
+1. **Home / Explore Screen**
+   - Header with app logo and “Explore”
+   - Grid or card list of stories
+   - Each story card shows short text, author, likes, and a “Read More” button
+   - Floating “+” button to create a new story
+
+2. **Story Generator Screen**
+   - Input fields for 3–5 “story blocks”
+   - “Generate Story” button
+   - Display AI-generated story in a styled text box
+   - Buttons: “Edit”, “Regenerate”, “Publish”
+
+3. **Story Detail Screen**
+   - Full story text
+   - Author info
+   - Like button (heart icon)
+   - Share button
+   - Back button
+
+4. **My Stories Screen**
+   - List of published and draft stories
+   - Each card has title, date, and likes
+   - Options to edit or delete
+
+5. **Profile Screen**
+   - User avatar
+   - Username, bio
+   - Total stories and total likes count
+   - “Edit Profile” button
+
+Design style:
+
+- Modern, minimal, friendly
+- Soft rounded corners
+- Light background with pastel accent colors
+- Typography: readable and clean (e.g., Inter or Poppins or any appropriate aesthetic fonts)
+- Include icons and subtle shadows for depth
+
+Include navigation tabs for: Home, Create, My Stories, Profile
