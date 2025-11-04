@@ -17,6 +17,9 @@ export const storyRouter = {
   getAllMyStoryBlocks: protectedProcedure.query(({ ctx }) => {
     return db.select().from(storyBlocks).where(eq(storyBlocks.userId, ctx.session.user.id))
   }),
+  getStoryById: protectedProcedure.input(z.object({ id: z.string() })).query(({ input }) => {
+    return db.select().from(stories).where(eq(stories.id, input.id))
+  }),
   deleteStoryBlock: protectedProcedure
     .input(
       z.object({

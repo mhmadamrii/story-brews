@@ -1,3 +1,5 @@
+import { useTRPC } from '@/utils/trpc'
+import { useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/(main)/stories/$id')({
@@ -5,12 +7,22 @@ export const Route = createFileRoute('/(main)/stories/$id')({
 })
 
 function RouteComponent() {
+  const trpc = useTRPC()
+
   const { id } = Route.useParams()
-  console.log('route by id', id)
+
+  const { data: story } = useQuery(
+    trpc.storyRouter.getStoryById.queryOptions({
+      id,
+    })
+  )
+
+  console.log('story', story)
 
   return (
     <div>
       <h1>Story by id</h1>
+      <pre>{JSON.stringify(story, null, 2)}</pre>
     </div>
   )
 }

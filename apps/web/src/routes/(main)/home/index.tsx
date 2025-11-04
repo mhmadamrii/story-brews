@@ -97,7 +97,7 @@ function RouteComponent() {
   }, [storiesData])
 
   return (
-    <div className="border border-red-500 w-full px-4 pt-4">
+    <div className="w-full px-4 pt-4">
       <section className="flex flex-col gap-4">
         <PopularStories />
         <div className="flex gap-2 w-full justify-between items-center">
@@ -145,7 +145,7 @@ function RouteComponent() {
                 {item?.content!.length > 150 && (
                   <button
                     onClick={() => handleViewDetails(item.id)}
-                    className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm mt-2 font-medium"
+                    className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm mt-2 font-medium cursor-pointer"
                   >
                     See details
                   </button>
