@@ -30,8 +30,8 @@ export function PopularStories() {
   const plugin = useRef(Autoplay({ delay: 2000, stopOnInteraction: true }))
 
   return (
-    <div>
-      <h1>Popular Stories</h1>
+    <div className="flex flex-col gap-4">
+      <h1 className="text-3xl">Every line was once a thought. Every thought, a story.</h1>
       <div>
         <Carousel
           plugins={[plugin.current]}

@@ -3,16 +3,17 @@ import z from 'zod'
 import { db, eq } from '@story-brew/db'
 import { stories, storyBlocks } from '@story-brew/db/schema/story'
 import { protectedProcedure } from '..'
+import { user } from '@story-brew/db/schema/auth'
 
 export const storyRouter = {
   getAllMyStories: protectedProcedure.query(({ ctx }) => {
     return db.select().from(stories).where(eq(stories.userId, ctx.session.user.id))
   }),
-  getPopularStories: protectedProcedure.query(({ ctx }) => {
+  getPopularStories: protectedProcedure.query(() => {
     return db.select().from(stories)
   }),
-  getAllStories: protectedProcedure.query(({ ctx }) => {
-    return db.select().from(stories)
+  getAllStories: protectedProcedure.query(() => {
+    return db.select().from(stories).innerJoin(user, eq(user.id, stories.userId))
   }),
   getAllMyStoryBlocks: protectedProcedure.query(({ ctx }) => {
     return db.select().from(storyBlocks).where(eq(storyBlocks.userId, ctx.session.user.id))

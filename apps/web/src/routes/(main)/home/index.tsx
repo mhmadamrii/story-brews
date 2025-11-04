@@ -36,6 +36,7 @@ type StoryData = {
   updatedAt: string
   userId: string | null
   likes: number
+  author: string
 }
 
 function RouteComponent() {
@@ -47,7 +48,6 @@ function RouteComponent() {
   const navigate = useNavigate()
 
   const { data: storiesData } = useQuery(trpc.storyRouter.getAllStories.queryOptions())
-  console.log('stories', stories)
 
   const truncateText = (text: string, maxLength = 150) => {
     if (text.length <= maxLength) return text
@@ -92,7 +92,8 @@ function RouteComponent() {
 
   useEffect(() => {
     if (storiesData) {
-      setStories(storiesData.map((s) => ({ ...s, likes: 5 })))
+      console.log('stories data', storiesData)
+      setStories(storiesData.map((s) => ({ ...s.stories, likes: 5, author: s.user.name })))
     }
   }, [storiesData])
 
@@ -100,8 +101,7 @@ function RouteComponent() {
     <div className="w-full px-4 pt-4">
       <section className="flex flex-col gap-4">
         <PopularStories />
-        <div className="flex gap-2 w-full justify-between items-center">
-          <h1 className="text-3xl">Every line was once a thought. Every thought, a story.</h1>
+        <div className="flex gap-2 w-full justify-end items-center">
           <div className="flex gap-2">
             <Select>
               <SelectTrigger className="w-[180px]">
@@ -132,7 +132,7 @@ function RouteComponent() {
                 <CardTitle className="text-xl font-bold">{item.title}</CardTitle>
                 <CardDescription className="flex items-center gap-2 text-sm">
                   <User className="w-4 h-4" />
-                  <span>Ousmane Dembele</span>
+                  <span>{item.author}</span>
                   <span className="text-gray-400">•</span>
                   <span>{formatDate(item.createdAt)}</span>
                 </CardDescription>
@@ -176,9 +176,14 @@ function RouteComponent() {
                     />
                   </Button>
                 </div>
-                <Button variant="outline" size="sm" onClick={() => handleViewDetails(item.id)}>
+                <Button
+                  className="cursor-pointer"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleViewDetails(item.id)}
+                >
                   <Eye className="w-4 h-4 mr-2" />
-                  Details
+                  Read
                 </Button>
               </CardFooter>
             </Card>
