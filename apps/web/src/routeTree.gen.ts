@@ -18,6 +18,7 @@ import { Route as mainStoriesIndexRouteImport } from './routes/(main)/stories/in
 import { Route as mainMyStoriesIndexRouteImport } from './routes/(main)/my-stories/index'
 import { Route as mainHomeIndexRouteImport } from './routes/(main)/home/index'
 import { Route as mainCreateStoryIndexRouteImport } from './routes/(main)/create-story/index'
+import { Route as mainStoriesIdRouteImport } from './routes/(main)/stories/$id'
 
 const mainRouteRoute = mainRouteRouteImport.update({
   id: '/(main)',
@@ -63,9 +64,15 @@ const mainCreateStoryIndexRoute = mainCreateStoryIndexRouteImport.update({
   path: '/create-story/',
   getParentRoute: () => mainRouteRoute,
 } as any)
+const mainStoriesIdRoute = mainStoriesIdRouteImport.update({
+  id: '/stories/$id',
+  path: '/stories/$id',
+  getParentRoute: () => mainRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof publicIndexRoute
+  '/stories/$id': typeof mainStoriesIdRoute
   '/create-story': typeof mainCreateStoryIndexRoute
   '/home': typeof mainHomeIndexRoute
   '/my-stories': typeof mainMyStoriesIndexRoute
@@ -76,6 +83,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof publicIndexRoute
+  '/stories/$id': typeof mainStoriesIdRoute
   '/create-story': typeof mainCreateStoryIndexRoute
   '/home': typeof mainHomeIndexRoute
   '/my-stories': typeof mainMyStoriesIndexRoute
@@ -88,6 +96,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/(main)': typeof mainRouteRouteWithChildren
   '/(public)/': typeof publicIndexRoute
+  '/(main)/stories/$id': typeof mainStoriesIdRoute
   '/(main)/create-story/': typeof mainCreateStoryIndexRoute
   '/(main)/home/': typeof mainHomeIndexRoute
   '/(main)/my-stories/': typeof mainMyStoriesIndexRoute
@@ -100,6 +109,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/stories/$id'
     | '/create-story'
     | '/home'
     | '/my-stories'
@@ -110,6 +120,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/stories/$id'
     | '/create-story'
     | '/home'
     | '/my-stories'
@@ -121,6 +132,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/(main)'
     | '/(public)/'
+    | '/(main)/stories/$id'
     | '/(main)/create-story/'
     | '/(main)/home/'
     | '/(main)/my-stories/'
@@ -203,10 +215,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof mainCreateStoryIndexRouteImport
       parentRoute: typeof mainRouteRoute
     }
+    '/(main)/stories/$id': {
+      id: '/(main)/stories/$id'
+      path: '/stories/$id'
+      fullPath: '/stories/$id'
+      preLoaderRoute: typeof mainStoriesIdRouteImport
+      parentRoute: typeof mainRouteRoute
+    }
   }
 }
 
 interface mainRouteRouteChildren {
+  mainStoriesIdRoute: typeof mainStoriesIdRoute
   mainCreateStoryIndexRoute: typeof mainCreateStoryIndexRoute
   mainHomeIndexRoute: typeof mainHomeIndexRoute
   mainMyStoriesIndexRoute: typeof mainMyStoriesIndexRoute
@@ -214,6 +234,7 @@ interface mainRouteRouteChildren {
 }
 
 const mainRouteRouteChildren: mainRouteRouteChildren = {
+  mainStoriesIdRoute: mainStoriesIdRoute,
   mainCreateStoryIndexRoute: mainCreateStoryIndexRoute,
   mainHomeIndexRoute: mainHomeIndexRoute,
   mainMyStoriesIndexRoute: mainMyStoriesIndexRoute,

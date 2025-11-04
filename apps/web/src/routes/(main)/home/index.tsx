@@ -1,8 +1,14 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { useTRPC } from '@/utils/trpc'
+import { PopularStories } from './-components/popular-stories'
+import { Button } from '@story-brew/ui/components/ui/button'
+import { Bookmark, Eye, Heart, User } from 'lucide-react'
+import { formatDate } from '@story-brew/ui/lib/utils'
 
 import {
   Card,
-  CardAction,
   CardContent,
   CardDescription,
   CardFooter,
@@ -22,46 +28,158 @@ export const Route = createFileRoute('/(main)/home/')({
   component: RouteComponent,
 })
 
+type StoryData = {
+  id: string
+  content: string | null
+  title: string
+  createdAt: string
+  updatedAt: string
+  userId: string | null
+  likes: number
+}
+
 function RouteComponent() {
+  const [stories, setStories] = useState<Array<StoryData>>()
+  const [likedStories, setLikedStories] = useState(new Set())
+  const [savedStories, setSavedStories] = useState(new Set())
+
+  const trpc = useTRPC()
+  const navigate = useNavigate()
+
+  const { data: storiesData } = useQuery(trpc.storyRouter.getAllStories.queryOptions())
+  console.log('stories', stories)
+
+  const truncateText = (text: string, maxLength = 150) => {
+    if (text.length <= maxLength) return text
+    return text.slice(0, maxLength).trim() + '...'
+  }
+
+  const handleViewDetails = (id: string) => {
+    navigate({
+      to: `/stories/${id}`,
+    })
+  }
+
+  const toggleLike = (id: string) => {
+    setLikedStories((prev) => {
+      const newSet = new Set(prev)
+      if (newSet.has(id)) {
+        newSet.delete(id)
+        setStories(
+          stories?.map((story) => (story.id === id ? { ...story, likes: story.likes - 1 } : story))
+        )
+      } else {
+        newSet.add(id)
+        setStories(
+          stories?.map((story) => (story.id === id ? { ...story, likes: story.likes + 1 } : story))
+        )
+      }
+      return newSet
+    })
+  }
+
+  const toggleSave = (id: string) => {
+    setSavedStories((prev) => {
+      const newSet = new Set(prev)
+      if (newSet.has(id)) {
+        newSet.delete(id)
+      } else {
+        newSet.add(id)
+      }
+      return newSet
+    })
+  }
+
+  useEffect(() => {
+    if (storiesData) {
+      setStories(storiesData.map((s) => ({ ...s, likes: 5 })))
+    }
+  }, [storiesData])
+
   return (
     <div className="border border-red-500 w-full px-4 pt-4">
-      <h1>Every line was once a thought. Every thought, a story.</h1>
       <section className="flex flex-col gap-4">
-        <div className="flex gap-2 w-full justify-end">
-          <Select>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Author" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="light">Light</SelectItem>
-              <SelectItem value="dark">Dark</SelectItem>
-              <SelectItem value="system">System</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="light">Light</SelectItem>
-              <SelectItem value="dark">Dark</SelectItem>
-              <SelectItem value="system">System</SelectItem>
-            </SelectContent>
-          </Select>
+        <PopularStories />
+        <div className="flex gap-2 w-full justify-between items-center">
+          <h1 className="text-3xl">Every line was once a thought. Every thought, a story.</h1>
+          <div className="flex gap-2">
+            <Select>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Author" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="light">Light</SelectItem>
+                <SelectItem value="dark">Dark</SelectItem>
+                <SelectItem value="system">System</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="light">Light</SelectItem>
+                <SelectItem value="dark">Dark</SelectItem>
+                <SelectItem value="system">System</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-4 sm:grid-cols-3 grid-rows-5 gap-4">
-          {Array.from({ length: 5 }).map((_, idx) => (
-            <Card key={idx}>
+        <div className="grid grid-cols-1 md:grid-cols-3 sm:grid-cols-2 grid-rows-5 gap-4">
+          {stories?.map((item) => (
+            <Card key={item.id} className="flex flex-col">
               <CardHeader>
-                <CardTitle>Card Title</CardTitle>
-                <CardDescription>Card Description</CardDescription>
-                <CardAction>Card Action</CardAction>
+                <CardTitle className="text-xl font-bold">{item.title}</CardTitle>
+                <CardDescription className="flex items-center gap-2 text-sm">
+                  <User className="w-4 h-4" />
+                  <span>Ousmane Dembele</span>
+                  <span className="text-gray-400">•</span>
+                  <span>{formatDate(item.createdAt)}</span>
+                </CardDescription>
               </CardHeader>
-              <CardContent>
-                <p>Card Content</p>
+
+              <CardContent className="flex-grow">
+                <p className="text-gray-700 dark:text-gray-300">
+                  {truncateText(item.content ?? '')}
+                </p>
+                {item?.content!.length > 150 && (
+                  <button
+                    onClick={() => handleViewDetails(item.id)}
+                    className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm mt-2 font-medium"
+                  >
+                    See details
+                  </button>
+                )}
               </CardContent>
-              <CardFooter>
-                <p>Card Footer</p>
+
+              <CardFooter className="flex items-center justify-between border-t pt-4">
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => toggleLike(item.id)}
+                    className={likedStories.has(item.id) ? 'text-red-500' : ''}
+                  >
+                    <Heart
+                      className={`w-5 h-5 ${likedStories.has(item.id) ? 'fill-current' : ''}`}
+                    />
+                    <span className="ml-1">{item.likes}</span>
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => toggleSave(item.id)}
+                    className={savedStories.has(item.id) ? 'text-blue-600' : ''}
+                  >
+                    <Bookmark
+                      className={`w-5 h-5 ${savedStories.has(item.id) ? 'fill-current' : ''}`}
+                    />
+                  </Button>
+                </div>
+                <Button variant="outline" size="sm" onClick={() => handleViewDetails(item.id)}>
+                  <Eye className="w-4 h-4 mr-2" />
+                  Details
+                </Button>
               </CardFooter>
             </Card>
           ))}

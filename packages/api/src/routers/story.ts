@@ -8,6 +8,12 @@ export const storyRouter = {
   getAllMyStories: protectedProcedure.query(({ ctx }) => {
     return db.select().from(stories).where(eq(stories.userId, ctx.session.user.id))
   }),
+  getPopularStories: protectedProcedure.query(({ ctx }) => {
+    return db.select().from(stories)
+  }),
+  getAllStories: protectedProcedure.query(({ ctx }) => {
+    return db.select().from(stories)
+  }),
   getAllMyStoryBlocks: protectedProcedure.query(({ ctx }) => {
     return db.select().from(storyBlocks).where(eq(storyBlocks.userId, ctx.session.user.id))
   }),
