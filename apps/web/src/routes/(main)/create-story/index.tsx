@@ -69,6 +69,10 @@ const STORY_CATEGORY = [
     id: 7,
     name: 'Romance',
   },
+  {
+    id: 8,
+    name: 'Horror',
+  },
 ]
 
 export const Route = createFileRoute('/(main)/create-story/')({
@@ -208,7 +212,7 @@ function RouteComponent() {
                 </div>
                 <div className="w-full flex flex-col gap-2">
                   <Label>Custom Context</Label>
-                  <Textarea ref={customPrompt} className="w-full" />
+                  <Textarea ref={customPrompt} className="w-full min-h-[200px]" />
                 </div>
                 <Button onClick={handleGenerate} className="w-full cursor-pointer">
                   Generate
