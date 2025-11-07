@@ -1,56 +1,45 @@
-import { useState } from 'react'
 import { Button } from '@story-brew/ui/components/ui/button'
-import { Plus, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Plus, Trash2 } from 'lucide-react'
 import { Textarea } from '@story-brew/ui/components/ui/textarea'
 import { ScrollArea, ScrollBar } from '@story-brew/ui/components/ui/scroll-area'
+import type { ContentPart } from '..'
 
-interface StoryPart {
-  id: string
-  content: string
-  createdAt: Date
-}
-
-export function StoryPart() {
-  const [parts, setParts] = useState<StoryPart[]>([{ id: '1', content: '', createdAt: new Date() }])
-  const [currentPartIndex, setCurrentPartIndex] = useState(0)
-
-  const currentPart = parts[currentPartIndex]
+export function StoryPart({
+  contentParts,
+  setContentParts,
+  currentPartIndex,
+  setCurrentPartIndex,
+}: {
+  contentParts: ContentPart
+  setContentParts: React.Dispatch<React.SetStateAction<ContentPart>>
+  currentPartIndex: number
+  setCurrentPartIndex: React.Dispatch<React.SetStateAction<number>>
+}) {
+  const currentPart = contentParts[currentPartIndex]
 
   const handleContentChange = (content: string) => {
-    const updatedParts = [...parts]
+    const updatedParts = [...contentParts]
     updatedParts[currentPartIndex].content = content
-    setParts(updatedParts)
+    setContentParts(updatedParts)
   }
 
   const handleAddPart = () => {
-    const newPart: StoryPart = {
+    const newPart = {
       id: Date.now().toString(),
+      order: contentParts.length + 1,
       content: '',
-      createdAt: new Date(),
     }
-    const newIndex = parts.length
-    setParts([...parts, newPart])
+    const newIndex = contentParts.length
+    setContentParts([...contentParts, newPart])
     setCurrentPartIndex(newIndex)
   }
 
   const handleDeletePart = (index: number) => {
-    if (parts.length === 1) return // Prevent deleting the last part
-    const updatedParts = parts.filter((_, i) => i !== index)
-    setParts(updatedParts)
+    if (contentParts.length === 1) return // Prevent deleting the last part
+    const updatedParts = contentParts.filter((_, i) => i !== index)
+    setContentParts(updatedParts)
     // Adjust current index if needed
     setCurrentPartIndex(Math.max(0, Math.min(currentPartIndex, updatedParts.length - 1)))
-  }
-
-  const handlePreviousPart = () => {
-    if (currentPartIndex > 0) {
-      setCurrentPartIndex(currentPartIndex - 1)
-    }
-  }
-
-  const handleNextPart = () => {
-    if (currentPartIndex < parts.length - 1) {
-      setCurrentPartIndex(currentPartIndex + 1)
-    }
   }
 
   return (
@@ -59,7 +48,7 @@ export function StoryPart() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <label className="text-sm font-semibold text-foreground">
-              Part {currentPartIndex + 1} of {parts.length}
+              Part {currentPartIndex + 1} of {contentParts.length}
             </label>
             <div className="text-xs text-muted-foreground">
               {currentPart.content.length} characters
@@ -75,7 +64,7 @@ export function StoryPart() {
         <h2 className="text-lg font-semibold text-foreground">Story Parts</h2>
         <ScrollArea className="pb-4 w-full whitespace-nowrap">
           <div className="flex gap-2">
-            {parts.map((part, index) => (
+            {contentParts.map((part, index) => (
               <div
                 key={part.id}
                 className={`p-3 w-40 rounded-lg border transition-colors cursor-pointer ${
@@ -100,7 +89,7 @@ export function StoryPart() {
                     variant="ghost"
                     size="sm"
                     className="text-destructive hover:bg-destructive/10 mt-2 w-full"
-                    disabled={parts.length === 1}
+                    disabled={contentParts.length === 1}
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>

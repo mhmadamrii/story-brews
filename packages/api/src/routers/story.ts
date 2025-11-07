@@ -22,8 +22,32 @@ export const storyRouter = {
   getAllMyStoryBlocks: protectedProcedure.query(({ ctx }) => {
     return db.select().from(storyBlocks).where(eq(storyBlocks.userId, ctx.session.user.id))
   }),
-  getStoryById: protectedProcedure.input(z.object({ id: z.string() })).query(({ input }) => {
-    return db.select().from(stories).where(eq(stories.id, input.id))
+  getStoryById: protectedProcedure.input(z.object({ id: z.string() })).query(async ({ input }) => {
+    const result = await db
+      .select({
+        story: stories,
+        user: user,
+        part: storyPart,
+      })
+      .from(stories)
+      .innerJoin(user, eq(user.id, stories.userId))
+      .leftJoin(storyPart, eq(storyPart.storyId, stories.id))
+      .where(eq(stories.id, input.id))
+
+    if (result.length === 0) {
+      return null
+    }
+
+    const story = {
+      ...result[0].story,
+      user: result[0].user,
+      parts: result
+        .filter((row) => row.part !== null)
+        .map((row) => row.part)
+        .sort((a, b) => a!.order - b!.order),
+    }
+
+    return story
   }),
   deleteStoryBlock: protectedProcedure
     .input(
@@ -60,7 +84,17 @@ export const storyRouter = {
     }),
   createWholeStore: protectedProcedure
     .input(
-      z.object({ title: z.string(), synopsis: z.string(), content: z.string(), order: z.number() })
+      z.object({
+        title: z.string(),
+        synopsis: z.string(),
+        contentParts: z.array(
+          z.object({
+            id: z.string(),
+            content: z.string(),
+            order: z.number(),
+          })
+        ),
+      })
     )
     .mutation(async ({ input, ctx }) => {
       return await db.transaction(async (tx) => {
@@ -73,11 +107,18 @@ export const storyRouter = {
           })
           .returning({ id: stories.id })
 
-        await tx.insert(storyPart).values({
-          storyId: story?.id,
-          content: input.content,
-          order: input.order,
-        })
+        if (!story) {
+          tx.rollback()
+          return
+        }
+
+        await tx.insert(storyPart).values(
+          input.contentParts.map((part) => ({
+            storyId: story.id,
+            content: part.content,
+            order: part.order,
+          }))
+        )
 
         return story
       })

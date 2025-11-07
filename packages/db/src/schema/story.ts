@@ -30,9 +30,13 @@ export const storyPart = pgTable('story_part', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 })
 
-export const storyRelations = relations(stories, ({ many }) => ({
+export const storyRelations = relations(stories, ({ many, one }) => ({
   blocks: many(storyBlocks),
   parts: many(storyPart),
+  user: one(user, {
+    fields: [stories.userId],
+    references: [user.id],
+  }),
 }))
 
 export const storyBlockRelations = relations(storyBlocks, ({ one }) => ({

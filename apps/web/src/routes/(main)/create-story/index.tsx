@@ -13,6 +13,7 @@ import { useRef, useState } from 'react'
 import { generateStoryWithAI, generateSynopsisWithAI } from '@story-brew/ai'
 import { Label } from '@story-brew/ui/components/ui/label'
 import { ScrollArea } from '@story-brew/ui/components/ui/scroll-area'
+import { STORY_CATEGORY } from '@/lib/constants'
 
 import {
   Card,
@@ -40,40 +41,11 @@ import {
   SelectValue,
 } from '@story-brew/ui/components/ui/select'
 
-const STORY_CATEGORY = [
-  {
-    id: 1,
-    name: 'Adventure',
-  },
-  {
-    id: 2,
-    name: 'Comedy',
-  },
-  {
-    id: 3,
-    name: 'Drama',
-  },
-  {
-    id: 4,
-    name: 'Mystery/Thriller',
-  },
-  {
-    id: 5,
-    name: 'Science Fiction',
-  },
-  {
-    id: 6,
-    name: 'Sport',
-  },
-  {
-    id: 7,
-    name: 'Romance',
-  },
-  {
-    id: 8,
-    name: 'Horror',
-  },
-]
+export type ContentPart = Array<{
+  id: string
+  order: number
+  content: string
+}>;
 
 export const Route = createFileRoute('/(main)/create-story/')({
   component: RouteComponent,
@@ -84,13 +56,16 @@ function RouteComponent() {
   const trpc = useTRPC()
 
   const customPrompt = useRef<HTMLTextAreaElement | null>(null)
-  const contentRef = useRef<HTMLTextAreaElement | null>(null)
   const synopsisRef = useRef<HTMLTextAreaElement | null>(null)
   const titleRef = useRef<HTMLInputElement | null>(null)
 
   const [selectedCategory, setSelectedCategory] = useState(0)
   const [lang, setLang] = useState<'en' | 'id'>('en')
   const [isOpen, setIsOpen] = useState(false)
+  const [contentParts, setContentParts] = useState<ContentPart>([
+    { id: Date.now().toString(), content: '', order: 1 },
+  ])
+  const [currentPartIndex, setCurrentPartIndex] = useState(0)
 
   const { data: storyBlocks } = useQuery(trpc.storyRouter.getAllMyStoryBlocks.queryOptions())
 
@@ -111,26 +86,32 @@ function RouteComponent() {
   )
 
   const handleGenerate = async () => {
-    console.log('aleez', STORY_CATEGORY[selectedCategory]?.name)
+    const previousContent = contentParts
+      .slice(0, currentPartIndex)
+      .map((part) => part.content)
+      .join('\n\n')
+
     const res = await generateStoryWithAI({
       category: STORY_CATEGORY[selectedCategory - 1].name,
       customPrompt: customPrompt.current?.value,
       storyBlocks: storyBlocks?.map((item) => item.content) || [],
       lang,
+      previousContent,
     })
-    console.log('response generation', res)
 
-    if (res && contentRef.current) {
-      contentRef.current.value = res
+    if (res) {
+      const updatedParts = [...contentParts]
+      updatedParts[currentPartIndex].content = res
+      setContentParts(updatedParts)
     }
   }
 
   const handleGenerateSynopsis = async () => {
-    if (!contentRef.current?.value) {
+    if (!contentParts[currentPartIndex].content) {
       toast.error('Please generate the story content first')
       return
     }
-    const res = await generateSynopsisWithAI(contentRef.current.value)
+    const res = await generateSynopsisWithAI(contentParts.map((part) => part.content).join('\n'))
     if (res && synopsisRef.current) {
       synopsisRef.current.value = res
     }
@@ -139,9 +120,8 @@ function RouteComponent() {
   const handleCreateStory = () => {
     createStory({
       title: titleRef.current?.value || '',
-      content: contentRef.current?.value || '',
       synopsis: synopsisRef.current?.value || '',
-      order: 1,
+      contentParts,
     })
   }
 
@@ -243,11 +223,12 @@ function RouteComponent() {
                 <Label>Title</Label>
                 <Input className="w-full" ref={titleRef} />
               </div>
-              {/* <div className="flex flex-col gap-2">
-                <Label>Content</Label>
-                <Textarea ref={contentRef} className="w-full h-[330px]" />
-              </div> */}
-              <StoryPart />
+              <StoryPart
+                contentParts={contentParts}
+                setContentParts={setContentParts}
+                currentPartIndex={currentPartIndex}
+                setCurrentPartIndex={setCurrentPartIndex}
+              />
               <div className="flex flex-col gap-2">
                 <Label>Synopsis</Label>
                 <Textarea ref={synopsisRef} className="w-full h-[200px]" />
