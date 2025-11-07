@@ -1,7 +1,7 @@
 import z from 'zod'
 
 import { db, eq } from '@story-brew/db'
-import { stories, storyBlocks } from '@story-brew/db/schema/story'
+import { stories, storyBlocks, storyPart } from '@story-brew/db/schema/story'
 import { protectedProcedure } from '..'
 import { user } from '@story-brew/db/schema/auth'
 
@@ -13,7 +13,11 @@ export const storyRouter = {
     return db.select().from(stories)
   }),
   getAllStories: protectedProcedure.query(() => {
-    return db.select().from(stories).innerJoin(user, eq(user.id, stories.userId))
+    return db
+      .select()
+      .from(stories)
+      .innerJoin(user, eq(user.id, stories.userId))
+      .innerJoin(storyPart, eq(storyPart.storyId, stories.id))
   }),
   getAllMyStoryBlocks: protectedProcedure.query(({ ctx }) => {
     return db.select().from(storyBlocks).where(eq(storyBlocks.userId, ctx.session.user.id))
@@ -55,15 +59,27 @@ export const storyRouter = {
         .returning()
     }),
   createWholeStore: protectedProcedure
-    .input(z.object({ title: z.string(), synopsis: z.string() }))
-    .mutation(({ input, ctx }) => {
-      return db
-        .insert(stories)
-        .values({
-          synopsis: input.synopsis,
-          userId: ctx.session.user.id,
-          title: input.title,
+    .input(
+      z.object({ title: z.string(), synopsis: z.string(), content: z.string(), order: z.number() })
+    )
+    .mutation(async ({ input, ctx }) => {
+      return await db.transaction(async (tx) => {
+        const [story] = await tx
+          .insert(stories)
+          .values({
+            synopsis: input.synopsis,
+            userId: ctx.session.user.id,
+            title: input.title,
+          })
+          .returning({ id: stories.id })
+
+        await tx.insert(storyPart).values({
+          storyId: story?.id,
+          content: input.content,
+          order: input.order,
         })
-        .returning({ id: stories.id })
+
+        return story
+      })
     }),
 }

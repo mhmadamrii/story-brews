@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { EmptyBlock } from './-components/empty-block'
+import { StoryPart } from './-components/story-part'
 import { useTRPC } from '@/utils/trpc'
 import { cn } from '@/lib/utils'
 import { toast } from 'sonner'
@@ -9,7 +10,7 @@ import { Textarea } from '@story-brew/ui/components/ui/textarea'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Loader, PencilLine, Plus, Trash } from 'lucide-react'
 import { useRef, useState } from 'react'
-import { generateStoryWithAI } from '@story-brew/ai'
+import { generateStoryWithAI, generateSynopsisWithAI } from '@story-brew/ai'
 import { Label } from '@story-brew/ui/components/ui/label'
 import { ScrollArea } from '@story-brew/ui/components/ui/scroll-area'
 
@@ -83,6 +84,7 @@ function RouteComponent() {
   const trpc = useTRPC()
 
   const customPrompt = useRef<HTMLTextAreaElement | null>(null)
+  const contentRef = useRef<HTMLTextAreaElement | null>(null)
   const synopsisRef = useRef<HTMLTextAreaElement | null>(null)
   const titleRef = useRef<HTMLInputElement | null>(null)
 
@@ -118,6 +120,17 @@ function RouteComponent() {
     })
     console.log('response generation', res)
 
+    if (res && contentRef.current) {
+      contentRef.current.value = res
+    }
+  }
+
+  const handleGenerateSynopsis = async () => {
+    if (!contentRef.current?.value) {
+      toast.error('Please generate the story content first')
+      return
+    }
+    const res = await generateSynopsisWithAI(contentRef.current.value)
     if (res && synopsisRef.current) {
       synopsisRef.current.value = res
     }
@@ -126,7 +139,9 @@ function RouteComponent() {
   const handleCreateStory = () => {
     createStory({
       title: titleRef.current?.value || '',
+      content: contentRef.current?.value || '',
       synopsis: synopsisRef.current?.value || '',
+      order: 1,
     })
   }
 
@@ -134,8 +149,12 @@ function RouteComponent() {
     <section className="flex flex-col gap-3 w-full px-4 py-4">
       <Card>
         <CardHeader>
-          <CardTitle>Every line was once a thought. Every thought, a story.</CardTitle>
-          <CardDescription>Card Description</CardDescription>
+          <CardTitle>
+            <div className="space-y-2">
+              <h1 className="text-3xl font-bold text-foreground">Story Editor</h1>
+            </div>
+          </CardTitle>
+          <CardDescription>Write your story part by part</CardDescription>
           <CardAction>
             <Button className="cursor-pointer flex items-center gap-2" onClick={handleCreateStory}>
               <PencilLine />
@@ -214,7 +233,7 @@ function RouteComponent() {
                   <Textarea ref={customPrompt} className="w-full min-h-[200px]" />
                 </div>
                 <Button onClick={handleGenerate} className="w-full cursor-pointer">
-                  Generate
+                  Generate Story
                 </Button>
               </div>
             </div>
@@ -224,14 +243,18 @@ function RouteComponent() {
                 <Label>Title</Label>
                 <Input className="w-full" ref={titleRef} />
               </div>
-              <div className="flex flex-col gap-2">
+              {/* <div className="flex flex-col gap-2">
                 <Label>Content</Label>
-                <Textarea ref={synopsisRef} className="w-full h-[330px]" />
-              </div>
+                <Textarea ref={contentRef} className="w-full h-[330px]" />
+              </div> */}
+              <StoryPart />
               <div className="flex flex-col gap-2">
                 <Label>Synopsis</Label>
-                <Textarea className="w-full h-[200px]" />
+                <Textarea ref={synopsisRef} className="w-full h-[200px]" />
               </div>
+              <Button onClick={handleGenerateSynopsis} className="w-full cursor-pointer">
+                Generate Synopsis
+              </Button>
             </div>
           </div>
         </CardContent>

@@ -37,6 +37,7 @@ type StoryData = {
   userId: string | null
   likes: number
   author: string
+  synopsis: string
 }
 
 function RouteComponent() {
@@ -93,7 +94,15 @@ function RouteComponent() {
   useEffect(() => {
     if (storiesData) {
       console.log('stories data', storiesData)
-      setStories(storiesData.map((s) => ({ ...s.stories, likes: 5, author: s.user.name })))
+      setStories(
+        storiesData.map((s) => ({
+          ...s.stories,
+          likes: 5,
+          author: s.user.name,
+          content: s.story_part.content,
+          synopsis: s.stories.synopsis,
+        }))
+      )
     }
   }, [storiesData])
 
@@ -138,9 +147,9 @@ function RouteComponent() {
                 </CardDescription>
               </CardHeader>
 
-              <CardContent className="flex-grow">
+              <CardContent>
                 <p className="text-gray-700 dark:text-gray-300">
-                  {truncateText(item.content ?? '')}
+                  {truncateText(item.synopsis ?? '')}
                 </p>
                 {item?.content!.length > 150 && (
                   <button
