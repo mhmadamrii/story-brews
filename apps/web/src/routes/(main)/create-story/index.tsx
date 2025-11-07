@@ -18,7 +18,6 @@ import {
   CardAction,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from '@story-brew/ui/components/ui/card'
@@ -84,7 +83,7 @@ function RouteComponent() {
   const trpc = useTRPC()
 
   const customPrompt = useRef<HTMLTextAreaElement | null>(null)
-  const storyRef = useRef<HTMLTextAreaElement | null>(null)
+  const synopsisRef = useRef<HTMLTextAreaElement | null>(null)
   const titleRef = useRef<HTMLInputElement | null>(null)
 
   const [selectedCategory, setSelectedCategory] = useState(0)
@@ -95,7 +94,7 @@ function RouteComponent() {
 
   const { mutate: createStory } = useMutation(
     trpc.storyRouter.createWholeStore.mutationOptions({
-      onSuccess: (res) => {
+      onSuccess: () => {
         toast.success('Story created successfully')
       },
     })
@@ -119,15 +118,15 @@ function RouteComponent() {
     })
     console.log('response generation', res)
 
-    if (res && storyRef.current) {
-      storyRef.current.value = res
+    if (res && synopsisRef.current) {
+      synopsisRef.current.value = res
     }
   }
 
   const handleCreateStory = () => {
     createStory({
       title: titleRef.current?.value || '',
-      content: storyRef.current?.value || '',
+      synopsis: synopsisRef.current?.value || '',
     })
   }
 
@@ -227,10 +226,10 @@ function RouteComponent() {
               </div>
               <div className="flex flex-col gap-2">
                 <Label>Content</Label>
-                <Textarea ref={storyRef} className="w-full h-[330px]" />
+                <Textarea ref={synopsisRef} className="w-full h-[330px]" />
               </div>
               <div className="flex flex-col gap-2">
-                <Label>Epilog</Label>
+                <Label>Synopsis</Label>
                 <Textarea className="w-full h-[200px]" />
               </div>
             </div>

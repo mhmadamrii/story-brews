@@ -55,12 +55,12 @@ export const storyRouter = {
         .returning()
     }),
   createWholeStore: protectedProcedure
-    .input(z.object({ title: z.string(), content: z.string() }))
+    .input(z.object({ title: z.string(), synopsis: z.string() }))
     .mutation(({ input, ctx }) => {
       return db
         .insert(stories)
         .values({
-          content: input.content,
+          synopsis: input.synopsis,
           userId: ctx.session.user.id,
           title: input.title,
         })

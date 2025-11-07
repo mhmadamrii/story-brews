@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/(public)/')({
   component: HomeComponent,
@@ -6,8 +6,8 @@ export const Route = createFileRoute('/(public)/')({
 
 function HomeComponent() {
   return (
-    <div className="absolute gap-2 w-full">
-      <div className="min-h-screen w-full relative right-0 left-0 bottom-0 top-0 bg-black">
+    <div className="relative w-full min-h-screen">
+      <div className="w-full absolute right-0 left-0 bottom-0 top-0 bg-black">
         <div
           className="absolute inset-0 z-0"
           style={{
@@ -15,6 +15,9 @@ function HomeComponent() {
               'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(120, 180, 255, 0.25), transparent 70%), #000000',
           }}
         />
+      </div>
+      <div className="absolute w-full h-full flex items-center justify-center">
+        <Link to="/home">Home</Link>
       </div>
     </div>
   )

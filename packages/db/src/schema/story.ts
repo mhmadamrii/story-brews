@@ -16,13 +16,23 @@ export const stories = pgTable('stories', {
   id: uuid('id').primaryKey().defaultRandom(),
   userId: text('user_id').references(() => user.id, { onDelete: 'cascade' }),
   title: varchar('title', { length: 255 }).notNull(),
-  content: text('content'),
+  synopsis: text('synopsis').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+})
+
+export const storyPart = pgTable('story_part', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  storyId: uuid('story_id').references(() => stories.id, { onDelete: 'cascade' }),
+  order: integer('order').notNull(),
+  content: text('content').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 })
 
 export const storyRelations = relations(stories, ({ many }) => ({
   blocks: many(storyBlocks),
+  parts: many(storyPart),
 }))
 
 export const storyBlockRelations = relations(storyBlocks, ({ one }) => ({
@@ -39,4 +49,11 @@ export const storyBlockRelations = relations(storyBlocks, ({ one }) => ({
 export const userRelations = relations(user, ({ many }) => ({
   blocks: many(storyBlocks),
   stories: many(stories),
+}))
+
+export const storyPartRelations = relations(storyPart, ({ one }) => ({
+  story: one(stories, {
+    fields: [storyPart.storyId],
+    references: [stories.id],
+  }),
 }))
