@@ -45,7 +45,7 @@ export type ContentPart = Array<{
   id: string
   order: number
   content: string
-}>;
+}>
 
 export const Route = createFileRoute('/(main)/create-story/')({
   component: RouteComponent,

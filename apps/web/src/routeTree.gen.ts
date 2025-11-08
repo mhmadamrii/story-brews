@@ -241,9 +241,7 @@ const mainRouteRouteChildren: mainRouteRouteChildren = {
   mainStoriesIndexRoute: mainStoriesIndexRoute,
 }
 
-const mainRouteRouteWithChildren = mainRouteRoute._addFileChildren(
-  mainRouteRouteChildren,
-)
+const mainRouteRouteWithChildren = mainRouteRoute._addFileChildren(mainRouteRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   mainRouteRoute: mainRouteRouteWithChildren,

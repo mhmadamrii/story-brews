@@ -36,15 +36,9 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "files": [
-    "./bin",
-    "./dist",
-    "./oclif.manifest.json"
-  ],
+  "files": ["./bin", "./dist", "./oclif.manifest.json"],
   "homepage": "https://github.com/apps/cli",
-  "keywords": [
-    "oclif"
-  ],
+  "keywords": ["oclif"],
   "license": "MIT",
   "main": "dist/index.js",
   "type": "module",
@@ -52,10 +46,7 @@
     "bin": "cli",
     "dirname": "cli",
     "commands": "./dist/commands",
-    "plugins": [
-      "@oclif/plugin-help",
-      "@oclif/plugin-plugins"
-    ],
+    "plugins": ["@oclif/plugin-help", "@oclif/plugin-plugins"],
     "topicSeparator": " ",
     "topics": {
       "hello": {
