@@ -18,6 +18,7 @@ import { Route as mainStoriesIndexRouteImport } from './routes/(main)/stories/in
 import { Route as mainMyStoriesIndexRouteImport } from './routes/(main)/my-stories/index'
 import { Route as mainHomeIndexRouteImport } from './routes/(main)/home/index'
 import { Route as mainCreateStoryIndexRouteImport } from './routes/(main)/create-story/index'
+import { Route as mainBookmarkIndexRouteImport } from './routes/(main)/bookmark/index'
 import { Route as mainStoriesIdRouteImport } from './routes/(main)/stories/$id'
 
 const mainRouteRoute = mainRouteRouteImport.update({
@@ -64,6 +65,11 @@ const mainCreateStoryIndexRoute = mainCreateStoryIndexRouteImport.update({
   path: '/create-story/',
   getParentRoute: () => mainRouteRoute,
 } as any)
+const mainBookmarkIndexRoute = mainBookmarkIndexRouteImport.update({
+  id: '/bookmark/',
+  path: '/bookmark/',
+  getParentRoute: () => mainRouteRoute,
+} as any)
 const mainStoriesIdRoute = mainStoriesIdRouteImport.update({
   id: '/stories/$id',
   path: '/stories/$id',
@@ -73,6 +79,7 @@ const mainStoriesIdRoute = mainStoriesIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof publicIndexRoute
   '/stories/$id': typeof mainStoriesIdRoute
+  '/bookmark': typeof mainBookmarkIndexRoute
   '/create-story': typeof mainCreateStoryIndexRoute
   '/home': typeof mainHomeIndexRoute
   '/my-stories': typeof mainMyStoriesIndexRoute
@@ -84,6 +91,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof publicIndexRoute
   '/stories/$id': typeof mainStoriesIdRoute
+  '/bookmark': typeof mainBookmarkIndexRoute
   '/create-story': typeof mainCreateStoryIndexRoute
   '/home': typeof mainHomeIndexRoute
   '/my-stories': typeof mainMyStoriesIndexRoute
@@ -97,6 +105,7 @@ export interface FileRoutesById {
   '/(main)': typeof mainRouteRouteWithChildren
   '/(public)/': typeof publicIndexRoute
   '/(main)/stories/$id': typeof mainStoriesIdRoute
+  '/(main)/bookmark/': typeof mainBookmarkIndexRoute
   '/(main)/create-story/': typeof mainCreateStoryIndexRoute
   '/(main)/home/': typeof mainHomeIndexRoute
   '/(main)/my-stories/': typeof mainMyStoriesIndexRoute
@@ -110,6 +119,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/stories/$id'
+    | '/bookmark'
     | '/create-story'
     | '/home'
     | '/my-stories'
@@ -121,6 +131,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/stories/$id'
+    | '/bookmark'
     | '/create-story'
     | '/home'
     | '/my-stories'
@@ -133,6 +144,7 @@ export interface FileRouteTypes {
     | '/(main)'
     | '/(public)/'
     | '/(main)/stories/$id'
+    | '/(main)/bookmark/'
     | '/(main)/create-story/'
     | '/(main)/home/'
     | '/(main)/my-stories/'
@@ -215,6 +227,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof mainCreateStoryIndexRouteImport
       parentRoute: typeof mainRouteRoute
     }
+    '/(main)/bookmark/': {
+      id: '/(main)/bookmark/'
+      path: '/bookmark'
+      fullPath: '/bookmark'
+      preLoaderRoute: typeof mainBookmarkIndexRouteImport
+      parentRoute: typeof mainRouteRoute
+    }
     '/(main)/stories/$id': {
       id: '/(main)/stories/$id'
       path: '/stories/$id'
@@ -227,6 +246,7 @@ declare module '@tanstack/react-router' {
 
 interface mainRouteRouteChildren {
   mainStoriesIdRoute: typeof mainStoriesIdRoute
+  mainBookmarkIndexRoute: typeof mainBookmarkIndexRoute
   mainCreateStoryIndexRoute: typeof mainCreateStoryIndexRoute
   mainHomeIndexRoute: typeof mainHomeIndexRoute
   mainMyStoriesIndexRoute: typeof mainMyStoriesIndexRoute
@@ -235,13 +255,16 @@ interface mainRouteRouteChildren {
 
 const mainRouteRouteChildren: mainRouteRouteChildren = {
   mainStoriesIdRoute: mainStoriesIdRoute,
+  mainBookmarkIndexRoute: mainBookmarkIndexRoute,
   mainCreateStoryIndexRoute: mainCreateStoryIndexRoute,
   mainHomeIndexRoute: mainHomeIndexRoute,
   mainMyStoriesIndexRoute: mainMyStoriesIndexRoute,
   mainStoriesIndexRoute: mainStoriesIndexRoute,
 }
 
-const mainRouteRouteWithChildren = mainRouteRoute._addFileChildren(mainRouteRouteChildren)
+const mainRouteRouteWithChildren = mainRouteRoute._addFileChildren(
+  mainRouteRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   mainRouteRoute: mainRouteRouteWithChildren,

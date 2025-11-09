@@ -13,11 +13,7 @@ export const storyRouter = {
     return db.select().from(stories)
   }),
   getAllStories: protectedProcedure.query(() => {
-    return db
-      .select()
-      .from(stories)
-      .innerJoin(user, eq(user.id, stories.userId))
-      .innerJoin(storyPart, eq(storyPart.storyId, stories.id))
+    return db.select().from(stories).innerJoin(user, eq(user.id, stories.userId))
   }),
   getAllMyStoryBlocks: protectedProcedure.query(({ ctx }) => {
     return db.select().from(storyBlocks).where(eq(storyBlocks.userId, ctx.session.user.id))
@@ -39,8 +35,8 @@ export const storyRouter = {
     }
 
     const story = {
-      ...result[0].story,
-      user: result[0].user,
+      ...result[0]?.story,
+      user: result[0]?.user,
       parts: result
         .filter((row) => row.part !== null)
         .map((row) => row.part)

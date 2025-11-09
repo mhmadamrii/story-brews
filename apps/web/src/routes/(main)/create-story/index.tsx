@@ -63,7 +63,11 @@ function RouteComponent() {
   const [lang, setLang] = useState<'en' | 'id'>('en')
   const [isOpen, setIsOpen] = useState(false)
   const [contentParts, setContentParts] = useState<ContentPart>([
-    { id: Date.now().toString(), content: '', order: 1 },
+    {
+      id: Date.now().toString(),
+      content: '',
+      order: 1,
+    },
   ])
   const [currentPartIndex, setCurrentPartIndex] = useState(0)
 
@@ -111,7 +115,12 @@ function RouteComponent() {
       toast.error('Please generate the story content first')
       return
     }
-    const res = await generateSynopsisWithAI(contentParts.map((part) => part.content).join('\n'))
+
+    const res = await generateSynopsisWithAI(
+      contentParts.map((part) => part.content).join('\n'),
+      lang
+    )
+
     if (res && synopsisRef.current) {
       synopsisRef.current.value = res
     }

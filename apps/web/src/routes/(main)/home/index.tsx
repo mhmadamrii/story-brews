@@ -30,7 +30,6 @@ export const Route = createFileRoute('/(main)/home/')({
 
 type StoryData = {
   id: string
-  content: string | null
   title: string
   createdAt: string
   updatedAt: string
@@ -99,7 +98,7 @@ function RouteComponent() {
           ...s.stories,
           likes: 5,
           author: s.user.name,
-          content: s.story_part.content,
+          // content: s.story_part.content,
           synopsis: s.stories.synopsis,
         }))
       )
@@ -134,7 +133,7 @@ function RouteComponent() {
             </Select>
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 sm:grid-cols-2 grid-rows-5 gap-4">
+        <div id="story-list" className="grid grid-cols-1 md:grid-cols-3 sm:grid-cols-2 gap-4">
           {stories?.map((item) => (
             <Card key={item.id} className="flex flex-col">
               <CardHeader>
@@ -148,10 +147,10 @@ function RouteComponent() {
               </CardHeader>
 
               <CardContent>
-                <p className="text-gray-700 dark:text-gray-300">
+                <p className="text-gray-700 dark:text-gray-300 italic">
                   {truncateText(item.synopsis ?? '')}
                 </p>
-                {item?.content!.length > 150 && (
+                {item?.synopsis!.length > 150 && (
                   <button
                     onClick={() => handleViewDetails(item.id)}
                     className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm mt-2 font-medium cursor-pointer"

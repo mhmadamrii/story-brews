@@ -1,4 +1,4 @@
-import { BookOpenText, Home, Library, PencilLine, Settings } from 'lucide-react'
+import { BookMarked, BookOpenText, Home, Library, PencilLine, Settings } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 
 import {
@@ -25,9 +25,9 @@ export function AppSidebar() {
       icon: BookOpenText,
     },
     {
-      title: 'All Stories',
-      url: '/stories',
-      icon: Library,
+      title: 'My Bookmarks',
+      url: '/bookmark',
+      icon: BookMarked,
     },
     {
       title: 'Create a Story',

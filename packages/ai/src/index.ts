@@ -12,8 +12,33 @@ Your task is to write short, engaging stories based on the user's inputs.
 Make sure each story has a clear beginning, middle, and end, with emotional depth and vivid imagery.
 `
 
+async function generate(systemPrompt: string, userPrompt: string) {
+  const chatCompletion = await groq.chat.completions.create({
+    messages: [
+      {
+        role: 'system',
+        content: systemPrompt,
+      },
+      {
+        role: 'user',
+        content: userPrompt,
+      },
+    ],
+    model: 'openai/gpt-oss-20b',
+    temperature: 1,
+    max_completion_tokens: 8192,
+    top_p: 1,
+    stream: false,
+    reasoning_effort: 'medium',
+    stop: null,
+  })
+
+  return chatCompletion.choices[0]?.message.content
+}
+
 export async function main() {
   const chatCompletion = await getGroqChatCompletion()
+  // eslint-disable-next-line no-console
   console.log(chatCompletion.choices[0]?.message?.content || '')
 }
 
@@ -39,37 +64,38 @@ export async function generateStoryWithAI({
   category,
   customPrompt = 'cool',
   storyBlocks = [],
+  lang = 'en',
+  previousContent = '',
 }: {
   category: string
   customPrompt?: string
   storyBlocks: string[]
+  lang: 'en' | 'id'
+  previousContent: string
 }) {
-  const chatCompletion = await groq.chat.completions.create({
-    messages: [
-      {
-        role: 'system',
-        content: SYSTEM_PROMPT,
-      },
-      {
-        role: 'user',
-        content: `
-Write a short story in the "${category}" genre.
+  const userPrompt = `
+Write a short story in the "${category}" genre, in ${lang === 'en' ? 'English' : 'Indonesian'}.
 Use this theme or idea: "${customPrompt}".
 If relevant, incorporate these story fragments or ideas: ${storyBlocks.join(', ')}.
+${previousContent ? `Continue from this previous content: "${previousContent}"` : ''}
 Keep the story under 400 words.
-`,
-      },
-    ],
-    model: 'openai/gpt-oss-20b',
-    temperature: 1,
-    max_completion_tokens: 8192,
-    top_p: 1,
-    stream: false,
-    reasoning_effort: 'medium',
-    stop: null,
-  })
+`
+  return generate(SYSTEM_PROMPT, userPrompt)
+}
 
-  console.log('chat completion', chatCompletion)
+/**
+ * Generate a synopsis for a story with AI
+ * @param storyContent The content of the story
+ * @returns A synopsis of the story
+ */
+export async function generateSynopsisWithAI(storyContent: string, lang: string) {
+  const systemPrompt = 'You are a helpful assistant that summarizes stories.'
+  const userPrompt = `
+Generate a concise synopsis for the following story. The synopsis should be under 100 words.
 
-  return chatCompletion.choices[0]?.message.content
+language: ${lang}
+Story:
+${storyContent}
+`
+  return generate(systemPrompt, userPrompt)
 }

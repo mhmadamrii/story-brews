@@ -25,7 +25,6 @@ export function PopularStories() {
   const trpc = useTRPC()
 
   const { data: popularStories } = useQuery(trpc.storyRouter.getPopularStories.queryOptions())
-  console.log('popularStories', popularStories)
 
   const plugin = useRef(Autoplay({ delay: 2000, stopOnInteraction: true }))
 

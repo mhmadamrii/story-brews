@@ -16,6 +16,7 @@ export const stories = pgTable('stories', {
   id: uuid('id').primaryKey().defaultRandom(),
   userId: text('user_id').references(() => user.id, { onDelete: 'cascade' }),
   title: varchar('title', { length: 255 }).notNull(),
+  likes: integer('likes').default(0),
   synopsis: text('synopsis').notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
@@ -26,6 +27,7 @@ export const storyPart = pgTable('story_part', {
   storyId: uuid('story_id').references(() => stories.id, { onDelete: 'cascade' }),
   order: integer('order').notNull(),
   content: text('content').notNull(),
+  likes: integer('likes').default(0),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 })
