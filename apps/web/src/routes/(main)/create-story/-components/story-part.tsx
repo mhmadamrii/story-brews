@@ -2,6 +2,7 @@ import { Button } from '@story-brew/ui/components/ui/button'
 import { Plus, Trash2 } from 'lucide-react'
 import { Textarea } from '@story-brew/ui/components/ui/textarea'
 import { ScrollArea, ScrollBar } from '@story-brew/ui/components/ui/scroll-area'
+import { EditorDialog } from './editor-dialog'
 import type { ContentPart } from '..'
 
 export function StoryPart({
@@ -16,6 +17,7 @@ export function StoryPart({
   setCurrentPartIndex: React.Dispatch<React.SetStateAction<number>>
 }) {
   const currentPart = contentParts[currentPartIndex]
+  console.log('currentPart', currentPart)
 
   const handleContentChange = (content: string) => {
     const updatedParts = [...contentParts]
@@ -45,6 +47,7 @@ export function StoryPart({
   return (
     <div className="w-full max-w-4xl mx-auto">
       <div className="space-y-2">
+        {/* <TipTapEditor initialContent={currentPart.content} /> */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <label className="text-sm font-semibold text-foreground">
@@ -53,6 +56,7 @@ export function StoryPart({
             <div className="text-xs text-muted-foreground">
               {currentPart.content.length} characters
             </div>
+            <EditorDialog />
           </div>
           <Textarea
             value={currentPart.content}

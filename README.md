@@ -125,3 +125,4 @@ Design style:
 - Include icons and subtle shadows for depth
 
 Include navigation tabs for: Home, Create, My Stories, Profile
+fad37293-05a1-422c-9e88-99cad86a27a1

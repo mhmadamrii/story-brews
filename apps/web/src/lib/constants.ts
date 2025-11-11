@@ -31,4 +31,8 @@ export const STORY_CATEGORY = [
     id: 8,
     name: 'Horror',
   },
+  {
+    id: 9,
+    name: 'Sorrow',
+  },
 ]

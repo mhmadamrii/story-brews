@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { StoryBlockDialog } from './-components/story-block-dialog'
 import { EmptyBlock } from './-components/empty-block'
 import { StoryPart } from './-components/story-part'
 import { useTRPC } from '@/utils/trpc'
@@ -8,7 +9,7 @@ import { Button } from '@story-brew/ui/components/ui/button'
 import { Input } from '@story-brew/ui/components/ui/input'
 import { Textarea } from '@story-brew/ui/components/ui/textarea'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Loader, PencilLine, Plus, Trash } from 'lucide-react'
+import { PencilLine, Plus, Trash } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { generateStoryWithAI, generateSynopsisWithAI } from '@story-brew/ai'
 import { Label } from '@story-brew/ui/components/ui/label'
@@ -23,15 +24,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@story-brew/ui/components/ui/card'
-
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@story-brew/ui/components/ui/dialog'
 
 import {
   Select,
@@ -62,6 +54,7 @@ function RouteComponent() {
   const [selectedCategory, setSelectedCategory] = useState(0)
   const [lang, setLang] = useState<'en' | 'id'>('en')
   const [isOpen, setIsOpen] = useState(false)
+  const [currentPartIndex, setCurrentPartIndex] = useState(0)
   const [contentParts, setContentParts] = useState<ContentPart>([
     {
       id: Date.now().toString(),
@@ -69,7 +62,6 @@ function RouteComponent() {
       order: 1,
     },
   ])
-  const [currentPartIndex, setCurrentPartIndex] = useState(0)
 
   const { data: storyBlocks } = useQuery(trpc.storyRouter.getAllMyStoryBlocks.queryOptions())
 
@@ -249,68 +241,11 @@ function RouteComponent() {
           </div>
         </CardContent>
       </Card>
-      <GenerateDialog
+      <StoryBlockDialog
         storyBlocksLength={storyBlocks?.length!}
         isOpen={isOpen}
         setIsOpen={setIsOpen}
       />
     </section>
-  )
-}
-
-function GenerateDialog({
-  isOpen,
-  setIsOpen,
-  storyBlocksLength,
-}: {
-  isOpen: boolean
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
-  storyBlocksLength: number
-}) {
-  const queryClient = useQueryClient()
-  const trpc = useTRPC()
-
-  const [blockContent, setBlockContent] = useState('')
-
-  const { mutate, isPending } = useMutation(
-    trpc.storyRouter.createStoryBlock.mutationOptions({
-      onSuccess: (res) => {
-        queryClient.invalidateQueries(trpc.storyRouter.getAllMyStoryBlocks.queryOptions())
-        setIsOpen(false)
-      },
-    })
-  )
-
-  return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogContent className="w-full max-h-full">
-        <DialogHeader>
-          <DialogTitle>Create new block</DialogTitle>
-          <DialogDescription>New block is used to add context to your story</DialogDescription>
-        </DialogHeader>
-        <div className="w-full flex flex-col gap-4">
-          <Input
-            value={blockContent}
-            onChange={(e) => setBlockContent(e.target.value)}
-            className="w-full"
-          />
-        </div>
-        <DialogFooter>
-          <Button
-            className="w-full cursor-pointer"
-            disabled={isPending}
-            onClick={() =>
-              mutate({
-                content: blockContent,
-                order: storyBlocksLength + 1,
-              })
-            }
-          >
-            {isPending && <Loader className="animate-spin" />}
-            Create block
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
   )
 }
