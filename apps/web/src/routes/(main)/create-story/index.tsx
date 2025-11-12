@@ -9,8 +9,8 @@ import { Button } from '@story-brew/ui/components/ui/button'
 import { Input } from '@story-brew/ui/components/ui/input'
 import { Textarea } from '@story-brew/ui/components/ui/textarea'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { PencilLine, Plus, Trash } from 'lucide-react'
-import { useRef, useState } from 'react'
+import { CheckCheck, CircleQuestionMark, PencilLine, Plus, Trash } from 'lucide-react'
+import { useState } from 'react'
 import { generateStoryWithAI, generateSynopsisWithAI } from '@story-brew/ai'
 import { Label } from '@story-brew/ui/components/ui/label'
 import { ScrollArea } from '@story-brew/ui/components/ui/scroll-area'
@@ -32,6 +32,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@story-brew/ui/components/ui/select'
+import { SynopsisDialog } from './-components/synopsis-dialog'
 
 export type ContentPart = Array<{
   id: string
@@ -47,10 +48,9 @@ function RouteComponent() {
   const queryClient = useQueryClient()
   const trpc = useTRPC()
 
-  const customPrompt = useRef<HTMLTextAreaElement | null>(null)
-  const synopsisRef = useRef<HTMLTextAreaElement | null>(null)
-  const titleRef = useRef<HTMLInputElement | null>(null)
-
+  const [title, setTitle] = useState('')
+  const [customPrompt, setCustomPrompt] = useState('')
+  const [synopsis, setSynopsis] = useState('')
   const [selectedCategory, setSelectedCategory] = useState(0)
   const [lang, setLang] = useState<'en' | 'id'>('en')
   const [isOpen, setIsOpen] = useState(false)
@@ -62,6 +62,8 @@ function RouteComponent() {
       order: 1,
     },
   ])
+
+  console.log('selectedCategory', selectedCategory)
 
   const { data: storyBlocks } = useQuery(trpc.storyRouter.getAllMyStoryBlocks.queryOptions())
 
@@ -89,7 +91,7 @@ function RouteComponent() {
 
     const res = await generateStoryWithAI({
       category: STORY_CATEGORY[selectedCategory - 1].name,
-      customPrompt: customPrompt.current?.value,
+      customPrompt,
       storyBlocks: storyBlocks?.map((item) => item.content) || [],
       lang,
       previousContent,
@@ -113,18 +115,25 @@ function RouteComponent() {
       lang
     )
 
-    if (res && synopsisRef.current) {
-      synopsisRef.current.value = res
+    if (res) {
+      setSynopsis(res)
     }
   }
 
   const handleCreateStory = () => {
     createStory({
-      title: titleRef.current?.value || '',
-      synopsis: synopsisRef.current?.value || '',
+      title,
+      synopsis,
       contentParts,
     })
   }
+
+  const isPublishable =
+    selectedCategory !== 0 &&
+    storyBlocks?.length! > 0 &&
+    title.length > 0 &&
+    synopsis.length > 0 &&
+    contentParts[0].content.length > 0
 
   return (
     <section className="flex flex-col gap-3 w-full px-4 py-4">
@@ -137,10 +146,14 @@ function RouteComponent() {
           </CardTitle>
           <CardDescription>Write your story part by part</CardDescription>
           <CardAction>
-            <Button className="cursor-pointer flex items-center gap-2" onClick={handleCreateStory}>
-              <PencilLine />
-              Publish
-            </Button>
+                        <Button
+                          className="cursor-pointer flex items-center gap-2"
+                          onClick={handleCreateStory}
+                          disabled={!isPublishable}
+                        >
+                          <PencilLine />
+                          Publish
+                        </Button>
           </CardAction>
         </CardHeader>
         <CardContent>
@@ -211,18 +224,33 @@ function RouteComponent() {
                 </div>
                 <div className="w-full flex flex-col gap-2">
                   <Label>Custom Context</Label>
-                  <Textarea ref={customPrompt} className="w-full min-h-[200px]" />
+                  <Textarea
+                    value={customPrompt}
+                    onChange={(e) => setCustomPrompt(e.target.value)}
+                    className="w-full min-h-[200px]"
+                  />
                 </div>
-                <Button onClick={handleGenerate} className="w-full cursor-pointer">
-                  Generate Story
-                </Button>
+                <div className="flex gap-2">
+                  <Button onClick={handleGenerate} className="cursor-pointer w-full sm:w-1/2">
+                    Generate Story
+                  </Button>
+                  <SynopsisDialog
+                    synopsis={synopsis}
+                    handleGenerateSynopsis={handleGenerateSynopsis}
+                    onSynopsisChange={setSynopsis}
+                  />
+                </div>
               </div>
             </div>
             <div className="w-full sm:w-1/2 h-full flex flex-col gap-3">
               <h1>Generated Story</h1>
               <div className="flex flex-col gap-2">
                 <Label>Title</Label>
-                <Input className="w-full" ref={titleRef} />
+                <Input
+                  className="w-full"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                />
               </div>
               <StoryPart
                 contentParts={contentParts}
@@ -230,13 +258,80 @@ function RouteComponent() {
                 currentPartIndex={currentPartIndex}
                 setCurrentPartIndex={setCurrentPartIndex}
               />
-              <div className="flex flex-col gap-2">
-                <Label>Synopsis</Label>
-                <Textarea ref={synopsisRef} className="w-full h-[200px]" />
+              <div id="requirements">
+                <ul className="list-inside list-disc">
+                  <li
+                    className={cn(
+                      'flex gap-2 items-center justify-between hover:underline cursor-pointer text-muted-foreground',
+                      {
+                        'text-green-500': selectedCategory !== 0,
+                      }
+                    )}
+                  >
+                    Story Category <CheckCheck size={15} />
+                  </li>
+                  <li
+                    onClick={() => setIsOpen(true)}
+                    className={cn(
+                      'flex gap-2 items-center justify-between hover:underline cursor-pointer text-muted-foreground',
+                      {
+                        'text-green-500': storyBlocks?.length! > 0,
+                      }
+                    )}
+                  >
+                    Story Block <CheckCheck size={15} />
+                  </li>
+                  <li
+                    onClick={() => setLang('en')}
+                    className="flex gap-2 items-center justify-between hover:underline cursor-pointer text-green-500"
+                  >
+                    Select Language <CheckCheck size={15} />
+                  </li>
+                  <li
+                    className={cn(
+                      'flex gap-2 items-center justify-between hover:underline cursor-pointer text-muted-foreground',
+                      {
+                        'text-green-500': customPrompt.length > 0,
+                      }
+                    )}
+                  >
+                    Custom Context <CircleQuestionMark size={15} />
+                  </li>
+                  <li
+                    className={cn(
+                      'flex gap-2 items-center justify-between hover:underline cursor-pointer text-muted-foreground',
+                      {
+                        'text-green-500': title.length > 0,
+                      }
+                    )}
+                  >
+                    Story Title <CheckCheck size={15} />
+                  </li>
+                  <li className="flex gap-2 items-center justify-between hover:underline cursor-pointer text-green-500">
+                    Story Parts <CircleQuestionMark size={15} />
+                  </li>
+                  <li
+                    className={cn(
+                      'flex gap-2 items-center justify-between hover:underline cursor-pointer text-muted-foreground',
+                      {
+                        'text-green-500': synopsis.length > 0,
+                      }
+                    )}
+                  >
+                    Story Synopsis <CheckCheck size={15} />
+                  </li>
+                  <li
+                    className={cn(
+                      'flex gap-2 items-center justify-between hover:underline cursor-pointer text-muted-foreground',
+                      {
+                        'text-green-500': contentParts[0].content.length > 0,
+                      }
+                    )}
+                  >
+                    Generated Story <CheckCheck size={15} />
+                  </li>
+                </ul>
               </div>
-              <Button onClick={handleGenerateSynopsis} className="w-full cursor-pointer">
-                Generate Synopsis
-              </Button>
             </div>
           </div>
         </CardContent>
