@@ -1,4 +1,5 @@
 import { protectedProcedure, publicProcedure, router } from '../index'
+import { bookmarkRouter } from './bookmark'
 import { storyRouter } from './story'
 
 export const appRouter = router({
@@ -12,5 +13,6 @@ export const appRouter = router({
     }
   }),
   storyRouter,
+  bookmarkRouter,
 })
 export type AppRouter = typeof appRouter

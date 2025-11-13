@@ -32,6 +32,14 @@ export const storyPart = pgTable('story_part', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 })
 
+export const bookmark = pgTable('bookmark', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  storyId: uuid('story_id').references(() => stories.id, { onDelete: 'cascade' }),
+  userId: text('user_id').references(() => user.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+})
+
 export const storyRelations = relations(stories, ({ many, one }) => ({
   blocks: many(storyBlocks),
   parts: many(storyPart),
@@ -39,6 +47,7 @@ export const storyRelations = relations(stories, ({ many, one }) => ({
     fields: [stories.userId],
     references: [user.id],
   }),
+  bookmarks: many(bookmark),
 }))
 
 export const storyBlockRelations = relations(storyBlocks, ({ one }) => ({
@@ -52,14 +61,20 @@ export const storyBlockRelations = relations(storyBlocks, ({ one }) => ({
   }),
 }))
 
-export const userRelations = relations(user, ({ many }) => ({
-  blocks: many(storyBlocks),
-  stories: many(stories),
-}))
-
 export const storyPartRelations = relations(storyPart, ({ one }) => ({
   story: one(stories, {
     fields: [storyPart.storyId],
     references: [stories.id],
+  }),
+}))
+
+export const bookmarkRelations = relations(bookmark, ({ one }) => ({
+  story: one(stories, {
+    fields: [bookmark.storyId],
+    references: [stories.id],
+  }),
+  user: one(user, {
+    fields: [bookmark.userId],
+    references: [user.id],
   }),
 }))
