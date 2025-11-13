@@ -1,7 +1,7 @@
 import z from 'zod'
 
-import { db, eq } from '@story-brew/db'
-import { stories, storyBlocks, storyPart } from '@story-brew/db/schema/story'
+import { db, eq, and, desc } from '@story-brew/db'
+import { bookmark, stories, storyBlocks, storyPart } from '@story-brew/db/schema/story'
 import { protectedProcedure } from '..'
 import { user } from '@story-brew/db/schema/auth'
 
@@ -13,7 +13,12 @@ export const storyRouter = {
     return db.select().from(stories)
   }),
   getAllStories: protectedProcedure.query(() => {
-    return db.select().from(stories).innerJoin(user, eq(user.id, stories.userId))
+    return db
+      .select()
+      .from(stories)
+      .innerJoin(user, eq(user.id, stories.userId))
+      .leftJoin(bookmark, and(eq(bookmark.storyId, stories.id), eq(bookmark.userId, user.id)))
+      .orderBy(desc(stories.createdAt))
   }),
   getAllMyStoryBlocks: protectedProcedure.query(({ ctx }) => {
     return db.select().from(storyBlocks).where(eq(storyBlocks.userId, ctx.session.user.id))

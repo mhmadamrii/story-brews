@@ -44,7 +44,7 @@ function RootDocument() {
       <head>
         <HeadContent />
       </head>
-      <body>
+      <body className="bg-sidebar relative">
         <Outlet />
         <Toaster richColors />
         <TanStackRouterDevtools position="bottom-left" />

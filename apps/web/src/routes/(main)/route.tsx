@@ -3,6 +3,7 @@ import { createFileRoute, Outlet, redirect, useRouterState } from '@tanstack/rea
 import { Loader } from 'lucide-react'
 import { SidebarProvider, SidebarTrigger } from '@story-brew/ui/components/ui/sidebar'
 import { AppSidebar } from '@/components/app-sidebar'
+import { ScrollArea } from '@story-brew/ui/components/ui/scroll-area'
 
 export const Route = createFileRoute('/(main)')({
   component: RouteComponent,
@@ -26,14 +27,16 @@ function RouteComponent() {
     <main>
       <SidebarProvider>
         <AppSidebar />
-        <SidebarTrigger />
-        {isLoading ? (
-          <div className="w-full flex justify-center items-center">
-            <Loader className="animate-spin" />
-          </div>
-        ) : (
-          <Outlet />
-        )}
+        <ScrollArea className="border my-2 py-2 ml-2 mr-2 rounded-lg bg-[#121212] h-[calc(100vh-15px)] w-full">
+          <SidebarTrigger />
+          {isLoading ? (
+            <div className="w-full flex justify-center items-center h-[calc(100vh-15px)]">
+              <Loader className="animate-spin" />
+            </div>
+          ) : (
+            <Outlet />
+          )}
+        </ScrollArea>
       </SidebarProvider>
     </main>
   )

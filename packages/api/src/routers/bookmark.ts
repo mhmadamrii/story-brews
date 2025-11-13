@@ -1,6 +1,6 @@
 import z from 'zod'
 
-import { db, eq } from '@story-brew/db'
+import { and, db, eq } from '@story-brew/db'
 import { protectedProcedure } from '..'
 import { bookmark } from '@story-brew/db/schema/story'
 
@@ -19,5 +19,23 @@ export const bookmarkRouter = {
         storyId: input.storyId,
         userId: ctx.session.user.id,
       })
+    }),
+  toggleBookmark: protectedProcedure
+    .input(z.object({ storyId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const existingBookmark = await db
+        .select()
+        .from(bookmark)
+        .where(and(eq(bookmark.storyId, input.storyId), eq(bookmark.userId, ctx.session.user.id)))
+
+      console.log('existingBookmark', existingBookmark)
+
+      if (existingBookmark.length > 0) {
+        await db.delete(bookmark).where(eq(bookmark.id, existingBookmark[0]!.id))
+        return { bookmarked: false }
+      } else {
+        await db.insert(bookmark).values({ userId: ctx.session.user.id, storyId: input.storyId })
+        return { bookmarked: true }
+      }
     }),
 }

@@ -34,7 +34,7 @@ function RouteComponent() {
   console.log('mystories', myStories)
 
   return (
-    <div className="mx-auto container">
+    <div className="p-2">
       <h1>My Stories</h1>
       <div className="grid grid-cols-5 grid-rows-5 gap-4">
         {myStories?.map((item) => (

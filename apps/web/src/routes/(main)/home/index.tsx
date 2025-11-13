@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTRPC } from '@/utils/trpc'
 import { PopularStories } from './-components/popular-stories'
 import { Button } from '@story-brew/ui/components/ui/button'
@@ -37,9 +37,12 @@ type StoryData = {
   likes: number
   author: string
   synopsis: string
+  isBookmarked: boolean
 }
 
 function RouteComponent() {
+  const queryClient = useQueryClient()
+
   const [stories, setStories] = useState<Array<StoryData>>()
   const [likedStories, setLikedStories] = useState(new Set())
   const [savedStories, setSavedStories] = useState(new Set())
@@ -48,6 +51,15 @@ function RouteComponent() {
   const navigate = useNavigate()
 
   const { data: storiesData } = useQuery(trpc.storyRouter.getAllStories.queryOptions())
+  console.log('storiesData', storiesData)
+
+  const { mutate: bookmarkStory } = useMutation(
+    trpc.bookmarkRouter.toggleBookmark.mutationOptions({
+      onSuccess: (r) => {
+        queryClient.invalidateQueries()
+      },
+    })
+  )
 
   const truncateText = (text: string, maxLength = 150) => {
     if (text.length <= maxLength) return text
@@ -79,6 +91,10 @@ function RouteComponent() {
   }
 
   const toggleSave = (id: string) => {
+    bookmarkStory({
+      storyId: id,
+    })
+
     setSavedStories((prev) => {
       const newSet = new Set(prev)
       if (newSet.has(id)) {
@@ -92,7 +108,6 @@ function RouteComponent() {
 
   useEffect(() => {
     if (storiesData) {
-      console.log('stories data', storiesData)
       setStories(
         storiesData.map((s) => ({
           ...s.stories,
@@ -100,6 +115,7 @@ function RouteComponent() {
           author: s.user.name,
           // content: s.story_part.content,
           synopsis: s.stories.synopsis,
+          isBookmarked: s.bookmark?.id ? true : false,
         }))
       )
     }
@@ -145,7 +161,6 @@ function RouteComponent() {
                   <span>{formatDate(item.createdAt)}</span>
                 </CardDescription>
               </CardHeader>
-
               <CardContent>
                 <p className="text-gray-700 dark:text-gray-300 italic">
                   {truncateText(item.synopsis ?? '')}
@@ -159,7 +174,6 @@ function RouteComponent() {
                   </button>
                 )}
               </CardContent>
-
               <CardFooter className="flex items-center justify-between border-t pt-4">
                 <div className="flex items-center gap-2">
                   <Button
@@ -177,10 +191,12 @@ function RouteComponent() {
                     variant="ghost"
                     size="sm"
                     onClick={() => toggleSave(item.id)}
-                    className={savedStories.has(item.id) ? 'text-blue-600' : ''}
+                    className={
+                      savedStories.has(item.id) || item.isBookmarked ? 'text-blue-600' : ''
+                    }
                   >
                     <Bookmark
-                      className={`w-5 h-5 ${savedStories.has(item.id) ? 'fill-current' : ''}`}
+                      className={`w-5 h-5 ${savedStories.has(item.id) || item.isBookmarked ? 'fill-current' : ''}`}
                     />
                   </Button>
                 </div>
