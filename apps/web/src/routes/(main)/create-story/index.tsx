@@ -1,4 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@story-brew/ui/components/ui/tooltip'
+import { SynopsisDialog } from './-components/synopsis-dialog'
 import { StoryBlockDialog } from './-components/story-block-dialog'
 import { EmptyBlock } from './-components/empty-block'
 import { StoryPart } from './-components/story-part'
@@ -9,7 +11,7 @@ import { Button } from '@story-brew/ui/components/ui/button'
 import { Input } from '@story-brew/ui/components/ui/input'
 import { Textarea } from '@story-brew/ui/components/ui/textarea'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { CheckCheck, CircleQuestionMark, PencilLine, Plus, Trash } from 'lucide-react'
+import { CheckCheck, CircleQuestionMark, PencilLine, Plus, Trash, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 import { generateStoryWithAI, generateSynopsisWithAI } from '@story-brew/ai'
 import { Label } from '@story-brew/ui/components/ui/label'
@@ -32,7 +34,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@story-brew/ui/components/ui/select'
-import { SynopsisDialog } from './-components/synopsis-dialog'
 
 export type ContentPart = Array<{
   id: string
@@ -63,12 +64,10 @@ function RouteComponent() {
     },
   ])
 
-  console.log('selectedCategory', selectedCategory)
-
   const { data: storyBlocks } = useQuery(trpc.storyRouter.getAllMyStoryBlocks.queryOptions())
 
   const { mutate: createStory } = useMutation(
-    trpc.storyRouter.createWholeStore.mutationOptions({
+    trpc.storyRouter.createWholeStory.mutationOptions({
       onSuccess: () => {
         toast.success('Story created successfully')
       },
@@ -77,6 +76,14 @@ function RouteComponent() {
 
   const { mutate: deleteStoryBlock } = useMutation(
     trpc.storyRouter.deleteStoryBlock.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries(trpc.storyRouter.getAllMyStoryBlocks.queryOptions())
+      },
+    })
+  )
+
+  const { mutate: deleteAllBlocks } = useMutation(
+    trpc.storyRouter.deleteAllStoryBlocks.mutationOptions({
       onSuccess: () => {
         queryClient.invalidateQueries(trpc.storyRouter.getAllMyStoryBlocks.queryOptions())
       },
@@ -146,14 +153,14 @@ function RouteComponent() {
           </CardTitle>
           <CardDescription>Write your story part by part</CardDescription>
           <CardAction>
-                        <Button
-                          className="cursor-pointer flex items-center gap-2"
-                          onClick={handleCreateStory}
-                          disabled={!isPublishable}
-                        >
-                          <PencilLine />
-                          Publish
-                        </Button>
+            <Button
+              className="cursor-pointer flex items-center gap-2"
+              onClick={handleCreateStory}
+              disabled={!isPublishable}
+            >
+              <PencilLine />
+              Publish
+            </Button>
           </CardAction>
         </CardHeader>
         <CardContent>
@@ -181,14 +188,40 @@ function RouteComponent() {
               <div className="flex flex-col gap-2">
                 <div className="flex justify-between items-center">
                   <Label>Story Blocks</Label>
-                  <Button
-                    variant="secondary"
-                    size="icon"
-                    onClick={() => setIsOpen(true)}
-                    className="cursor-pointer"
-                  >
-                    <Plus />
-                  </Button>
+
+                  <div className="flex gap-2">
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <Button
+                          variant="destructive"
+                          size="icon"
+                          onClick={() => deleteAllBlocks()}
+                          className="cursor-pointer"
+                        >
+                          <Trash2 />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Remove All</p>
+                      </TooltipContent>
+                    </Tooltip>
+
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <Button
+                          variant="secondary"
+                          size="icon"
+                          onClick={() => setIsOpen(true)}
+                          className="cursor-pointer"
+                        >
+                          <Plus />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>Add New Block</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </div>
                 </div>
                 <ScrollArea className="h-[200px] border rounded-sm py-1 px-2">
                   {storyBlocks?.length == 0 && <EmptyBlock />}

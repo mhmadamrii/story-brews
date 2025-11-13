@@ -14,6 +14,8 @@ import { Route as publicIndexRouteImport } from './routes/(public)/index'
 import { Route as publicMotionIndexRouteImport } from './routes/(public)/motion/index'
 import { Route as publicLoginIndexRouteImport } from './routes/(public)/login/index'
 import { Route as publicAboutIndexRouteImport } from './routes/(public)/about/index'
+import { Route as playPlayIndexRouteImport } from './routes/(play)/play/index'
+import { Route as playAgainIndexRouteImport } from './routes/(play)/again/index'
 import { Route as mainStoriesIndexRouteImport } from './routes/(main)/stories/index'
 import { Route as mainSettingsIndexRouteImport } from './routes/(main)/settings/index'
 import { Route as mainMyStoriesIndexRouteImport } from './routes/(main)/my-stories/index'
@@ -44,6 +46,16 @@ const publicLoginIndexRoute = publicLoginIndexRouteImport.update({
 const publicAboutIndexRoute = publicAboutIndexRouteImport.update({
   id: '/(public)/about/',
   path: '/about/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const playPlayIndexRoute = playPlayIndexRouteImport.update({
+  id: '/(play)/play/',
+  path: '/play/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const playAgainIndexRoute = playAgainIndexRouteImport.update({
+  id: '/(play)/again/',
+  path: '/again/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const mainStoriesIndexRoute = mainStoriesIndexRouteImport.update({
@@ -91,6 +103,8 @@ export interface FileRoutesByFullPath {
   '/my-stories': typeof mainMyStoriesIndexRoute
   '/settings': typeof mainSettingsIndexRoute
   '/stories': typeof mainStoriesIndexRoute
+  '/again': typeof playAgainIndexRoute
+  '/play': typeof playPlayIndexRoute
   '/about': typeof publicAboutIndexRoute
   '/login': typeof publicLoginIndexRoute
   '/motion': typeof publicMotionIndexRoute
@@ -104,6 +118,8 @@ export interface FileRoutesByTo {
   '/my-stories': typeof mainMyStoriesIndexRoute
   '/settings': typeof mainSettingsIndexRoute
   '/stories': typeof mainStoriesIndexRoute
+  '/again': typeof playAgainIndexRoute
+  '/play': typeof playPlayIndexRoute
   '/about': typeof publicAboutIndexRoute
   '/login': typeof publicLoginIndexRoute
   '/motion': typeof publicMotionIndexRoute
@@ -119,6 +135,8 @@ export interface FileRoutesById {
   '/(main)/my-stories/': typeof mainMyStoriesIndexRoute
   '/(main)/settings/': typeof mainSettingsIndexRoute
   '/(main)/stories/': typeof mainStoriesIndexRoute
+  '/(play)/again/': typeof playAgainIndexRoute
+  '/(play)/play/': typeof playPlayIndexRoute
   '/(public)/about/': typeof publicAboutIndexRoute
   '/(public)/login/': typeof publicLoginIndexRoute
   '/(public)/motion/': typeof publicMotionIndexRoute
@@ -134,6 +152,8 @@ export interface FileRouteTypes {
     | '/my-stories'
     | '/settings'
     | '/stories'
+    | '/again'
+    | '/play'
     | '/about'
     | '/login'
     | '/motion'
@@ -147,6 +167,8 @@ export interface FileRouteTypes {
     | '/my-stories'
     | '/settings'
     | '/stories'
+    | '/again'
+    | '/play'
     | '/about'
     | '/login'
     | '/motion'
@@ -161,6 +183,8 @@ export interface FileRouteTypes {
     | '/(main)/my-stories/'
     | '/(main)/settings/'
     | '/(main)/stories/'
+    | '/(play)/again/'
+    | '/(play)/play/'
     | '/(public)/about/'
     | '/(public)/login/'
     | '/(public)/motion/'
@@ -169,6 +193,8 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   mainRouteRoute: typeof mainRouteRouteWithChildren
   publicIndexRoute: typeof publicIndexRoute
+  playAgainIndexRoute: typeof playAgainIndexRoute
+  playPlayIndexRoute: typeof playPlayIndexRoute
   publicAboutIndexRoute: typeof publicAboutIndexRoute
   publicLoginIndexRoute: typeof publicLoginIndexRoute
   publicMotionIndexRoute: typeof publicMotionIndexRoute
@@ -209,6 +235,20 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof publicAboutIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(play)/play/': {
+      id: '/(play)/play/'
+      path: '/play'
+      fullPath: '/play'
+      preLoaderRoute: typeof playPlayIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/(play)/again/': {
+      id: '/(play)/again/'
+      path: '/again'
+      fullPath: '/again'
+      preLoaderRoute: typeof playAgainIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(main)/stories/': {
@@ -290,6 +330,8 @@ const mainRouteRouteWithChildren = mainRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   mainRouteRoute: mainRouteRouteWithChildren,
   publicIndexRoute: publicIndexRoute,
+  playAgainIndexRoute: playAgainIndexRoute,
+  playPlayIndexRoute: playPlayIndexRoute,
   publicAboutIndexRoute: publicAboutIndexRoute,
   publicLoginIndexRoute: publicLoginIndexRoute,
   publicMotionIndexRoute: publicMotionIndexRoute,

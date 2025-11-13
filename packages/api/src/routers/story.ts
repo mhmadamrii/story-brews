@@ -57,6 +57,9 @@ export const storyRouter = {
         .where(eq(storyBlocks.id, input.id))
         .returning({ id: storyBlocks.id })
     }),
+  deleteAllStoryBlocks: protectedProcedure.mutation(({ ctx }) => {
+    return db.delete(storyBlocks).where(eq(storyBlocks.userId, ctx.session.user.id))
+  }),
   deleteStory: protectedProcedure.input(z.object({ id: z.string() })).mutation(({ input }) => {
     return db.delete(stories).where(eq(stories.id, input.id)).returning({ id: stories.id })
   }),
@@ -78,7 +81,7 @@ export const storyRouter = {
         })
         .returning()
     }),
-  createWholeStore: protectedProcedure
+  createWholeStory: protectedProcedure
     .input(
       z.object({
         title: z.string(),
