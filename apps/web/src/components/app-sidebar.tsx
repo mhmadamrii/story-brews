@@ -43,7 +43,7 @@ export function AppSidebar() {
   ]
 
   return (
-    <Sidebar className="border-l-0 border-transparent">
+    <Sidebar className="border-l-0 border-t-2 border-transparent">
       <SidebarContent className="border-r-0">
         <SidebarGroup>
           <SidebarGroupLabel>Application</SidebarGroupLabel>

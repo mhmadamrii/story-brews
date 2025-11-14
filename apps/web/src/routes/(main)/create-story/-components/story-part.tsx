@@ -1,8 +1,7 @@
 import { Button } from '@story-brew/ui/components/ui/button'
-import { Plus, Trash2 } from 'lucide-react'
+import { CircleX, Plus, Trash2 } from 'lucide-react'
 import { Textarea } from '@story-brew/ui/components/ui/textarea'
 import { ScrollArea, ScrollBar } from '@story-brew/ui/components/ui/scroll-area'
-import { EditorDialog } from './editor-dialog'
 import type { ContentPart } from '..'
 
 export function StoryPart({
@@ -56,7 +55,6 @@ export function StoryPart({
             <div className="text-xs text-muted-foreground">
               {currentPart.content.length} characters
             </div>
-            <EditorDialog />
           </div>
           <Textarea
             value={currentPart.content}
@@ -72,16 +70,14 @@ export function StoryPart({
               <div
                 key={part.id}
                 className={`p-3 w-40 rounded-lg border transition-colors cursor-pointer ${
-                  currentPartIndex === index
-                    ? 'bg-accent border-primary'
-                    : 'bg-background border-input hover:bg-secondary'
+                  currentPartIndex === index ? 'bg-accent border-primary' : ''
                 }`}
                 onClick={() => setCurrentPartIndex(index)}
               >
-                <div className="flex flex-col justify-between h-full">
-                  <div>
+                <div className="flex justify-between h-full group relative">
+                  <div className="w-full">
                     <div className="font-medium text-foreground">Part {index + 1}</div>
-                    <div className="text-xs text-muted-foreground line-clamp-2 mt-1">
+                    <div className="text-xs text-muted-foreground truncate line-clamp-2 mt-1">
                       {part.content.length > 0 ? part.content.substring(0, 50) : 'Empty'}
                     </div>
                   </div>
@@ -90,12 +86,12 @@ export function StoryPart({
                       e.stopPropagation()
                       handleDeletePart(index)
                     }}
-                    variant="ghost"
-                    size="sm"
-                    className="text-destructive hover:bg-destructive/10 mt-2 w-full"
+                    variant="destructive"
+                    size="icon"
                     disabled={contentParts.length === 1}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer absolute top-0 right-0"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <CircleX size={15} />
                   </Button>
                 </div>
               </div>

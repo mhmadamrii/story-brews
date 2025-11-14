@@ -1,9 +1,11 @@
 import { getUser } from '@/functions/get-user'
 import { createFileRoute, Outlet, redirect, useRouterState } from '@tanstack/react-router'
 import { Loader } from 'lucide-react'
-import { SidebarProvider, SidebarTrigger } from '@story-brew/ui/components/ui/sidebar'
+import { SidebarProvider } from '@story-brew/ui/components/ui/sidebar'
 import { AppSidebar } from '@/components/app-sidebar'
 import { ScrollArea } from '@story-brew/ui/components/ui/scroll-area'
+import { HeaderLayout } from '@/components/header-layout'
+import { HeaderProvider, useHeader } from '@/lib/header-context'
 
 export const Route = createFileRoute('/(main)')({
   component: RouteComponent,
@@ -20,24 +22,35 @@ export const Route = createFileRoute('/(main)')({
   },
 })
 
-function RouteComponent() {
+function MainLayout() {
   const isLoading = useRouterState({ select: (s) => s.isLoading })
+  const { title, headerAction } = useHeader()
 
   return (
     <main>
       <SidebarProvider>
         <AppSidebar />
-        <ScrollArea className="border my-2 py-2 ml-2 mr-2 rounded-lg bg-[#121212] h-[calc(100vh-15px)] w-full">
-          <SidebarTrigger />
-          {isLoading ? (
-            <div className="w-full flex justify-center items-center h-[calc(100vh-15px)]">
-              <Loader className="animate-spin" />
-            </div>
-          ) : (
-            <Outlet />
-          )}
-        </ScrollArea>
+        <div className="border mt-2 py-0 px-2 ml-2 mr-1 rounded-md bg-[#121212] h-[calc(100vh-15px)] w-full relative">
+          <HeaderLayout title={title} headerAction={headerAction} />
+          <ScrollArea className="h-full pt-15">
+            {isLoading ? (
+              <div className="w-full flex justify-center items-center h-[calc(100vh-15px)]">
+                <Loader className="animate-spin" />
+              </div>
+            ) : (
+              <Outlet />
+            )}
+          </ScrollArea>
+        </div>
       </SidebarProvider>
     </main>
+  )
+}
+
+function RouteComponent() {
+  return (
+    <HeaderProvider>
+      <MainLayout />
+    </HeaderProvider>
   )
 }

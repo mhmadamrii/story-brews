@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { useHeader } from '@/lib/header-context'
 import { useEffect, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTRPC } from '@/utils/trpc'
@@ -50,8 +51,8 @@ function RouteComponent() {
   const trpc = useTRPC()
   const navigate = useNavigate()
 
+  const { setTitle } = useHeader()
   const { data: storiesData } = useQuery(trpc.storyRouter.getAllStories.queryOptions())
-  console.log('storiesData', storiesData)
 
   const { mutate: bookmarkStory } = useMutation(
     trpc.bookmarkRouter.toggleBookmark.mutationOptions({
@@ -107,6 +108,7 @@ function RouteComponent() {
   }
 
   useEffect(() => {
+    setTitle('Every line was once a thought. Every thought, a story.')
     if (storiesData) {
       setStories(
         storiesData.map((s) => ({
