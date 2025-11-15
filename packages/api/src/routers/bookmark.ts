@@ -28,8 +28,6 @@ export const bookmarkRouter = {
         .from(bookmark)
         .where(and(eq(bookmark.storyId, input.storyId), eq(bookmark.userId, ctx.session.user.id)))
 
-      console.log('existingBookmark', existingBookmark)
-
       if (existingBookmark.length > 0) {
         await db.delete(bookmark).where(eq(bookmark.id, existingBookmark[0]!.id))
         return { bookmarked: false }

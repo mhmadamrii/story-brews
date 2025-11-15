@@ -10,7 +10,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarTrigger,
 } from '@story-brew/ui/components/ui/sidebar'
 
 export function AppSidebar() {
@@ -47,7 +46,6 @@ export function AppSidebar() {
       <SidebarContent className="border-r-0">
         <SidebarGroup>
           <SidebarGroupLabel>Application</SidebarGroupLabel>
-          <SidebarTrigger />
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (

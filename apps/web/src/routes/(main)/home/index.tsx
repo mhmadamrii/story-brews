@@ -1,6 +1,8 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { toast } from 'sonner'
 import { useHeader } from '@/lib/header-context'
 import { useEffect, useState } from 'react'
+import { cn } from '@/lib/utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useTRPC } from '@/utils/trpc'
 import { PopularStories } from './-components/popular-stories'
@@ -57,7 +59,9 @@ function RouteComponent() {
   const { mutate: bookmarkStory } = useMutation(
     trpc.bookmarkRouter.toggleBookmark.mutationOptions({
       onSuccess: (r) => {
+        console.log('r', r)
         queryClient.invalidateQueries()
+        toast.success(`Story ${r.bookmarked ? 'saved' : 'removed'} successfully`)
       },
     })
   )
@@ -182,23 +186,25 @@ function RouteComponent() {
                     variant="ghost"
                     size="sm"
                     onClick={() => toggleLike(item.id)}
-                    className={likedStories.has(item.id) ? 'text-red-500' : ''}
+                    className={cn('cursor-pointer', likedStories.has(item.id) && 'text-red-500')}
                   >
-                    <Heart
-                      className={`w-5 h-5 ${likedStories.has(item.id) ? 'fill-current' : ''}`}
-                    />
+                    <Heart className={cn('w-5 h-5', likedStories.has(item.id) && 'fill-current')} />
                     <span className="ml-1">{item.likes}</span>
                   </Button>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => toggleSave(item.id)}
-                    className={
-                      savedStories.has(item.id) || item.isBookmarked ? 'text-blue-600' : ''
-                    }
+                    className={cn(
+                      'cursor-pointer',
+                      savedStories.has(item.id) || (item.isBookmarked && 'text-blue-600')
+                    )}
                   >
                     <Bookmark
-                      className={`w-5 h-5 ${savedStories.has(item.id) || item.isBookmarked ? 'fill-current' : ''}`}
+                      className={cn(
+                        'w-5 h-5',
+                        (savedStories.has(item.id) || item.isBookmarked) && 'fill-current'
+                      )}
                     />
                   </Button>
                 </div>
