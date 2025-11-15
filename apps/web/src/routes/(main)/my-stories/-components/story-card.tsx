@@ -1,5 +1,8 @@
 import { Heart, Eye, BookOpen, Clock, Trash2, ChevronRight } from 'lucide-react'
 import { Button } from '@story-brew/ui/components/ui/button'
+import { useState } from 'react'
+import { AlertDeleteStory } from './alert-delete-story'
+import { Link } from '@tanstack/react-router'
 
 interface Story {
   id: string
@@ -13,17 +16,10 @@ interface Story {
 
 interface StoryCardProps {
   story: Story
-  onDelete: () => void
 }
 
-export function StoryCard({ story, onDelete }: StoryCardProps) {
-  const handleDelete = () => {
-    if (
-      confirm(`Are you sure you want to delete "${story.title}"? This action cannot be undone.`)
-    ) {
-      onDelete()
-    }
-  }
+export function StoryCard({ story }: StoryCardProps) {
+  const [isOpenDelete, setIsOpenDelete] = useState(false)
 
   return (
     <div className="group relative overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-all duration-300 hover:shadow-lg">
@@ -67,18 +63,16 @@ export function StoryCard({ story, onDelete }: StoryCardProps) {
       </div>
       <div className="border-t border-border px-4 py-3 flex gap-2">
         <Button variant="outline" size="sm" className="flex-1" asChild>
-          <a href={`/story/${story.id}`} className="inline-flex items-center justify-center gap-2">
+          <Link
+            to={`/stories/$id`}
+            params={{ id: story.id }}
+            className="inline-flex items-center justify-center gap-2"
+          >
             Details
             <ChevronRight className="h-4 w-4" />
-          </a>
+          </Link>
         </Button>
-        <button
-          onClick={handleDelete}
-          className="inline-flex items-center justify-center rounded-lg bg-destructive/10 p-2 text-destructive transition-colors hover:bg-destructive/20"
-          aria-label="Delete story"
-        >
-          <Trash2 className="h-4 w-4" />
-        </button>
+        <AlertDeleteStory isOpen={isOpenDelete} setIsOpen={setIsOpenDelete} storyId={story.id} />
       </div>
     </div>
   )
