@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@story-brew/ui/components/ui/tooltip'
 import { SynopsisDialog } from './-components/synopsis-dialog'
 import { StoryBlockDialog } from './-components/story-block-dialog'
@@ -40,6 +40,8 @@ export const Route = createFileRoute('/(main)/create-story/')({
 function RouteComponent() {
   const queryClient = useQueryClient()
   const trpc = useTRPC()
+  const navigate = useNavigate()
+
   const { setHeaderAction, setTitle } = useHeader()
 
   const [title, setTitleState] = useState('')
@@ -63,6 +65,9 @@ function RouteComponent() {
     trpc.storyRouter.createWholeStory.mutationOptions({
       onSuccess: () => {
         toast.success('Story created successfully')
+        navigate({
+          to: '/my-stories',
+        })
       },
     })
   )
@@ -180,10 +185,9 @@ function RouteComponent() {
           <div className="flex flex-col gap-2">
             <div className="flex justify-between items-center">
               <Label>Story Blocks</Label>
-
               <div className="flex gap-2">
                 <Tooltip>
-                  <TooltipTrigger>
+                  <TooltipTrigger asChild>
                     <Button
                       variant="destructive"
                       size="icon"
@@ -197,9 +201,8 @@ function RouteComponent() {
                     <p>Remove All</p>
                   </TooltipContent>
                 </Tooltip>
-
                 <Tooltip>
-                  <TooltipTrigger>
+                  <TooltipTrigger asChild>
                     <Button
                       variant="secondary"
                       size="icon"
