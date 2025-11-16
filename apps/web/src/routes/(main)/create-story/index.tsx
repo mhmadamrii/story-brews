@@ -13,7 +13,7 @@ import { Textarea } from '@story-brew/ui/components/ui/textarea'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { CheckCheck, CircleQuestionMark, PencilLine, Plus, Trash, Trash2 } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
-import { generateStoryWithAI, generateSynopsisWithAI } from '@story-brew/ai'
+import { generateStoryWithGemini, generateSynopsisWithGemini } from '@story-brew/ai/gemini-story'
 import { Label } from '@story-brew/ui/components/ui/label'
 import { ScrollArea } from '@story-brew/ui/components/ui/scroll-area'
 import { STORY_CATEGORY } from '@/lib/constants'
@@ -94,7 +94,7 @@ function RouteComponent() {
       .map((part) => part.content)
       .join('\n\n')
 
-    const res = await generateStoryWithAI({
+    const res = await generateStoryWithGemini({
       category: STORY_CATEGORY[selectedCategory - 1].name,
       customPrompt,
       storyBlocks: storyBlocks?.map((item) => item.content) || [],
@@ -115,7 +115,7 @@ function RouteComponent() {
       return
     }
 
-    const res = await generateSynopsisWithAI(
+    const res = await generateSynopsisWithGemini(
       contentParts.map((part) => part.content).join('\n'),
       lang
     )

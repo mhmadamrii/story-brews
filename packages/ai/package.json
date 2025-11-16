@@ -8,16 +8,14 @@
     "build": "tsdown"
   },
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "default": "./src/index.ts"
-    },
     "./*": {
       "types": "./dist/*.d.ts",
       "default": "./src/*.ts"
     }
   },
   "dependencies": {
+    "@google/genai": "^1.29.1",
+    "@t3-oss/env-nextjs": "^0.13.8",
     "dotenv": "catalog:",
     "groq-sdk": "^0.34.0"
   },
