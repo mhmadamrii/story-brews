@@ -26,6 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@story-brew/ui/components/ui/select'
+import { EditorDialog } from './-components/editor-dialog'
 
 export type ContentPart = Array<{
   id: string
@@ -280,6 +281,7 @@ function RouteComponent() {
               onChange={(e) => setTitleState(e.target.value)}
             />
           </div>
+          <EditorDialog initialValue={contentParts[0].content} />
           <StoryPart
             contentParts={contentParts}
             setContentParts={setContentParts}

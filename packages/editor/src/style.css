@@ -1,0 +1,13 @@
+@import '@story-brew/ui/styles/globals.css';
+
+#testing {
+  color: brown;
+}
+
+.richtext-bg-background {
+  background-color: #171717 !important;
+}
+
+.reactjs-tiptap-editor {
+  height: 100% !important;
+}

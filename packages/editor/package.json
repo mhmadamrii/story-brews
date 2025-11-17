@@ -16,7 +16,8 @@
   "dependencies": {
     "@mdxeditor/editor": "^3.49.0",
     "lucide-react": "^0.553.0",
-    "reactjs-tiptap-editor": "^0.3.24"
+    "reactjs-tiptap-editor": "^0.3.24",
+    "@story-brew/ui": "workspace:*"
   },
   "devDependencies": {
     "@story-brew/typescript-config": "workspace:*",

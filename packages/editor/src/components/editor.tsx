@@ -29,6 +29,7 @@ import { TextDirection } from 'reactjs-tiptap-editor/textdirection'
 import { CheckCheck, Loader, Loader2 } from 'lucide-react'
 
 import 'reactjs-tiptap-editor/style.css'
+import '../style.css'
 // import 'prism-code-editor-lightweight/layout.css'
 // import 'prism-code-editor-lightweight/themes/github-dark.css'
 
@@ -116,7 +117,7 @@ export default function TipTapEditor({ initialContent }: { initialContent: strin
           <Loader className="animate-spin" />
         </div>
       ) : (
-        <section className="flex min-h-[600px] border border-red-500 flex-col gap-4 p-4">
+        <section className="flex flex-col gap-4 p-0">
           <div className="flex h-[60px] w-full items-center justify-end">
             {isPending ? (
               <Loader2 className="h-4 w-4 animate-spin" />

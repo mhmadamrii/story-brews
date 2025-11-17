@@ -1,4 +1,4 @@
-import { EditorClient } from '@/components/editor/editor-client'
+import { EditorClient } from '@story-brew/editor/editor'
 import { Suspense } from 'react'
 
 import {
@@ -10,14 +10,17 @@ import {
   DialogTrigger,
 } from '@story-brew/ui/components/ui/dialog'
 
-export function EditorDialog() {
+export function EditorDialog({ initialValue }: { initialValue: string }) {
   return (
     <Dialog>
-      <DialogTrigger>Open</DialogTrigger>
-      <DialogContent className="min-w-5xl p-0">
-        <DialogHeader></DialogHeader>
-        <Suspense fallback={<div>Loading...</div>}>
-          <EditorClient initialContent={'hello world'} />
+      <DialogTrigger>Creative Mode</DialogTrigger>
+      <DialogContent className="min-w-full sm:min-w-5xl">
+        <DialogHeader>
+          <DialogTitle>Here it is a tagline</DialogTitle>
+          <DialogDescription>Here it is a description</DialogDescription>
+        </DialogHeader>
+        <Suspense fallback={<div className="h-[300px] w-full">Loading...</div>}>
+          <EditorClient initialContent={initialValue} />
         </Suspense>
       </DialogContent>
     </Dialog>

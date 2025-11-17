@@ -35,7 +35,6 @@
     "radix-ui": "^1.4.2",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "reactjs-tiptap-editor": "^0.3.24",
     "sonner": "^2.0.3",
     "tailwind-merge": "^3.3.1",
     "tailwindcss": "^4.1.3",
