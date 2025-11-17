@@ -10,7 +10,13 @@ import {
   DialogTrigger,
 } from '@story-brew/ui/components/ui/dialog'
 
-export function EditorDialog({ initialValue }: { initialValue: string }) {
+export function EditorDialog({
+  initialValue,
+  onChange,
+}: {
+  initialValue: string
+  onChange: (content: string) => void
+}) {
   return (
     <Dialog>
       <DialogTrigger>Creative Mode</DialogTrigger>
@@ -20,7 +26,7 @@ export function EditorDialog({ initialValue }: { initialValue: string }) {
           <DialogDescription>Here it is a description</DialogDescription>
         </DialogHeader>
         <Suspense fallback={<div className="h-[300px] w-full">Loading...</div>}>
-          <EditorClient initialContent={initialValue} />
+          <EditorClient initialContent={initialValue} onChange={onChange} />
         </Suspense>
       </DialogContent>
     </Dialog>

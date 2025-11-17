@@ -139,7 +139,7 @@ function RouteComponent() {
     storyBlocks?.length! > 0 &&
     title.length > 0 &&
     synopsis.length > 0 &&
-    contentParts[0].content.length > 0
+    contentParts[currentPartIndex].content.length > 0
 
   useEffect(() => {
     setTitle('Story Editor')
@@ -159,6 +159,12 @@ function RouteComponent() {
       setTitle('Story Brew')
     }
   }, [handleCreateStory, isPublishable, setHeaderAction, setTitle])
+
+  const handleContentChange = (newContent: string) => {
+    const updatedParts = [...contentParts]
+    updatedParts[currentPartIndex].content = newContent
+    setContentParts(updatedParts)
+  }
 
   return (
     <section className="flex flex-col gap-3 w-full px-4 py-4">
@@ -281,7 +287,10 @@ function RouteComponent() {
               onChange={(e) => setTitleState(e.target.value)}
             />
           </div>
-          <EditorDialog initialValue={contentParts[0].content} />
+          <EditorDialog
+            initialValue={contentParts[currentPartIndex].content}
+            onChange={handleContentChange}
+          />
           <StoryPart
             contentParts={contentParts}
             setContentParts={setContentParts}
@@ -341,12 +350,9 @@ function RouteComponent() {
                 Story Parts <CircleQuestionMark size={15} />
               </li>
               <li
-                className={cn(
-                  'flex gap-2 items-center justify-between hover:underline cursor-pointer text-muted-foreground',
-                  {
-                    'text-green-500': synopsis.length > 0,
-                  }
-                )}
+                className={cn('flex gap-2 items-center justify-.tsx', {
+                  'text-green-500': synopsis.length > 0,
+                })}
               >
                 Story Synopsis <CheckCheck size={15} />
               </li>
@@ -354,7 +360,7 @@ function RouteComponent() {
                 className={cn(
                   'flex gap-2 items-center justify-between hover:underline cursor-pointer text-muted-foreground',
                   {
-                    'text-green-500': contentParts[0].content.length > 0,
+                    'text-green-500': contentParts[currentPartIndex].content.length > 0,
                   }
                 )}
               >

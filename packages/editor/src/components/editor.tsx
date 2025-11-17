@@ -77,38 +77,16 @@ const extensions = [
   Mention,
 ]
 
-function debounce<T extends (...args: any[]) => void>(
-  func: T,
-  wait: number
-): (...args: Parameters<T>) => void {
-  let timeout: NodeJS.Timeout
-  return function (...args: Parameters<T>) {
-    clearTimeout(timeout)
-    timeout = setTimeout(() => func(...args), wait)
-  }
-}
-
-export default function TipTapEditor({ initialContent }: { initialContent: string }) {
+export default function TipTapEditor({
+  initialContent,
+  onChange,
+}: {
+  initialContent: string
+  onChange: (content: string) => void
+}) {
   const isLoading = false
   const isPending = false
-  const initialNoteBlock = {
-    content: '',
-  }
   const editorRef = useRef<any>(null)
-
-  const debouncedUpdate = useCallback(
-    debounce((value: string) => {
-      //   updateNote({ groupId, title: 'note block', content: value })
-      console.log('updating', value)
-    }, 1000),
-    []
-  )
-
-  useEffect(() => {
-    // if (initialNoteBlock?.content && editorRef.current) {
-    //   editorRef.current.commands.setContent(initialNoteBlock.content)
-    // }
-  }, [initialNoteBlock, editorRef])
 
   return (
     <>
@@ -135,7 +113,7 @@ export default function TipTapEditor({ initialContent }: { initialContent: strin
             extensions={extensions}
             dark
             content={initialContent}
-            onChangeContent={(e) => console.log('a shit', e)}
+            onChangeContent={(newContent) => onChange(newContent)}
           />
         </section>
       )}
