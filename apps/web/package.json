@@ -14,6 +14,7 @@
     "@story-brew/api": "workspace:*",
     "@story-brew/auth": "workspace:*",
     "@story-brew/ui": "workspace:*",
+    "@story-brew/editor": "workspace:*",
     "@tailwindcss/vite": "^4.1.8",
     "@tanstack/react-form": "^1.23.5",
     "@tanstack/react-query": "^5.85.5",
