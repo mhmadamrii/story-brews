@@ -11,7 +11,8 @@
   "types": "dist/index.d.ts",
   "exports": {
     ".": "./src/components/editor-client.tsx",
-    "./editor": "./src/components/editor-client.tsx"
+    "./editor": "./src/components/editor-client.tsx",
+    "./read-only-editor": "./src/components/read-only-editor.tsx"
   },
   "dependencies": {
     "@mdxeditor/editor": "^3.49.0",

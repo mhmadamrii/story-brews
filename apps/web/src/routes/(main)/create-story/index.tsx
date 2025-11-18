@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { EditorDialog } from './-components/editor-dialog'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@story-brew/ui/components/ui/tooltip'
 import { SynopsisDialog } from './-components/synopsis-dialog'
 import { StoryBlockDialog } from './-components/story-block-dialog'
@@ -26,7 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@story-brew/ui/components/ui/select'
-import { EditorDialog } from './-components/editor-dialog'
+import { CreativeMode } from './-components/creative-mode'
 
 export type ContentPart = Array<{
   id: string
@@ -52,6 +53,7 @@ function RouteComponent() {
   const [lang, setLang] = useState<'en' | 'id'>('en')
   const [isOpen, setIsOpen] = useState(false)
   const [currentPartIndex, setCurrentPartIndex] = useState(0)
+  const [isCreativeMode, setIsCreativeMode] = useState(false)
   const [contentParts, setContentParts] = useState<ContentPart>([
     {
       id: Date.now().toString(),
@@ -126,6 +128,12 @@ function RouteComponent() {
     }
   }
 
+  const handleContentChange = (newContent: string) => {
+    const updatedParts = [...contentParts]
+    updatedParts[currentPartIndex].content = newContent
+    setContentParts(updatedParts)
+  }
+
   const handleCreateStory = useCallback(() => {
     createStory({
       title,
@@ -160,216 +168,218 @@ function RouteComponent() {
     }
   }, [handleCreateStory, isPublishable, setHeaderAction, setTitle])
 
-  const handleContentChange = (newContent: string) => {
-    const updatedParts = [...contentParts]
-    updatedParts[currentPartIndex].content = newContent
-    setContentParts(updatedParts)
-  }
-
   return (
     <section className="flex flex-col gap-3 w-full px-4 py-4">
-      <div className="w-full flex flex-col sm:flex-row gap-3">
-        <div className="w-full sm:w-1/2 flex flex-col gap-6">
-          <div className="flex flex-col gap-2">
-            <Label>Category</Label>
-            <div className="flex gap-2 flex-wrap">
-              {STORY_CATEGORY.map((item) => (
-                <div
-                  className={cn(
-                    'py-2 bg-accent cursor-pointer hover:text-black hover:bg-accent-foreground px-3 border rounded-full',
-                    {
-                      'bg-accent-foreground text-black': selectedCategory === item.id,
-                    }
-                  )}
-                  key={item.id}
-                  onClick={() => setSelectedCategory(item.id)}
-                >
-                  <h1>{item.name}</h1>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="flex flex-col gap-2">
-            <div className="flex justify-between items-center">
-              <Label>Story Blocks</Label>
-              <div className="flex gap-2">
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="destructive"
-                      size="icon"
-                      onClick={() => deleteAllBlocks()}
-                      className="cursor-pointer"
-                    >
-                      <Trash2 />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Remove All</p>
-                  </TooltipContent>
-                </Tooltip>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="secondary"
-                      size="icon"
-                      onClick={() => setIsOpen(true)}
-                      className="cursor-pointer"
-                    >
-                      <Plus />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p>Add New Block</p>
-                  </TooltipContent>
-                </Tooltip>
-              </div>
-            </div>
-            <ScrollArea className="h-[200px] border rounded-sm py-1 px-2">
-              {storyBlocks?.length == 0 && <EmptyBlock />}
-              <div className="w-full flex flex-col gap-2">
-                {storyBlocks?.map((item) => (
-                  <div key={item.id} className="flex w-full justify-between items-center">
-                    <h1>{item.content}</h1>
-                    <Button
-                      onClick={() => deleteStoryBlock({ id: item.id })}
-                      className="cursor-pointer"
-                      size="icon"
-                      variant="ghost"
-                    >
-                      <Trash className="cursor-pointer" />
-                    </Button>
+      {!isCreativeMode && (
+        <div className="w-full flex flex-col sm:flex-row gap-3">
+          <div className="w-full sm:w-1/2 flex flex-col gap-6">
+            <div className="flex flex-col gap-2">
+              <Label>Category</Label>
+              <div className="flex gap-2 flex-wrap">
+                {STORY_CATEGORY.map((item) => (
+                  <div
+                    className={cn(
+                      'py-2 bg-accent cursor-pointer hover:text-black hover:bg-accent-foreground px-3 border rounded-full',
+                      {
+                        'bg-accent-foreground text-black': selectedCategory === item.id,
+                      }
+                    )}
+                    key={item.id}
+                    onClick={() => setSelectedCategory(item.id)}
+                  >
+                    <h1>{item.name}</h1>
                   </div>
                 ))}
               </div>
-            </ScrollArea>
-          </div>
-          <div className="w-full flex flex-col gap-4">
-            <div className="w-full flex flex-col gap-2">
-              <Label>Select Language</Label>
-              <Select onValueChange={(value) => setLang(value as 'en' | 'id')}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Language" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="en">English</SelectItem>
-                  <SelectItem value="id">Indonesia</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
-            <div className="w-full flex flex-col gap-2">
-              <Label>Custom Context</Label>
-              <Textarea
-                value={customPrompt}
-                onChange={(e) => setCustomPrompt(e.target.value)}
-                className="w-full min-h-[200px]"
+            <div className="flex flex-col gap-2">
+              <div className="flex justify-between items-center">
+                <Label>Story Blocks</Label>
+                <div className="flex gap-2">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        onClick={() => deleteAllBlocks()}
+                        className="cursor-pointer"
+                      >
+                        <Trash2 />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Remove All</p>
+                    </TooltipContent>
+                  </Tooltip>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        variant="secondary"
+                        size="icon"
+                        onClick={() => setIsOpen(true)}
+                        className="cursor-pointer"
+                      >
+                        <Plus />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Add New Block</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+              </div>
+              <ScrollArea className="h-[200px] border rounded-sm py-1 px-2">
+                {storyBlocks?.length == 0 && <EmptyBlock />}
+                <div className="w-full flex flex-col gap-2">
+                  {storyBlocks?.map((item) => (
+                    <div key={item.id} className="flex w-full justify-between items-center">
+                      <h1>{item.content}</h1>
+                      <Button
+                        onClick={() => deleteStoryBlock({ id: item.id })}
+                        className="cursor-pointer"
+                        size="icon"
+                        variant="ghost"
+                      >
+                        <Trash className="cursor-pointer" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </ScrollArea>
+            </div>
+            <div className="w-full flex flex-col gap-4">
+              <div className="w-full flex flex-col gap-2">
+                <Label>Select Language</Label>
+                <Select onValueChange={(value) => setLang(value as 'en' | 'id')}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Language" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="en">English</SelectItem>
+                    <SelectItem value="id">Indonesia</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="w-full flex flex-col gap-2">
+                <Label>Custom Context</Label>
+                <Textarea
+                  value={customPrompt}
+                  onChange={(e) => setCustomPrompt(e.target.value)}
+                  className="w-full min-h-[200px]"
+                />
+              </div>
+              <div className="flex gap-2">
+                <Button onClick={handleGenerate} className="cursor-pointer w-full sm:w-1/2">
+                  Generate Story
+                </Button>
+                <SynopsisDialog
+                  synopsis={synopsis}
+                  handleGenerateSynopsis={handleGenerateSynopsis}
+                  onSynopsisChange={setSynopsis}
+                />
+              </div>
+            </div>
+          </div>
+          <div className="w-full sm:w-1/2 h-full flex flex-col gap-3">
+            <h1>Generated Story</h1>
+            <div className="flex flex-col gap-2">
+              <Label>Title</Label>
+              <Input
+                className="w-full"
+                value={title}
+                onChange={(e) => setTitleState(e.target.value)}
               />
             </div>
-            <div className="flex gap-2">
-              <Button onClick={handleGenerate} className="cursor-pointer w-full sm:w-1/2">
-                Generate Story
-              </Button>
-              <SynopsisDialog
-                synopsis={synopsis}
-                handleGenerateSynopsis={handleGenerateSynopsis}
-                onSynopsisChange={setSynopsis}
-              />
-            </div>
-          </div>
-        </div>
-        <div className="w-full sm:w-1/2 h-full flex flex-col gap-3">
-          <h1>Generated Story</h1>
-          <div className="flex flex-col gap-2">
-            <Label>Title</Label>
-            <Input
-              className="w-full"
-              value={title}
-              onChange={(e) => setTitleState(e.target.value)}
+            <Button onClick={() => setIsCreativeMode(true)} className="w-full">
+              Creative Mode
+            </Button>
+            <StoryPart
+              contentParts={contentParts}
+              setContentParts={setContentParts}
+              currentPartIndex={currentPartIndex}
+              setCurrentPartIndex={setCurrentPartIndex}
             />
-          </div>
-          <EditorDialog
-            initialValue={contentParts[currentPartIndex].content}
-            onChange={handleContentChange}
-          />
-          <StoryPart
-            contentParts={contentParts}
-            setContentParts={setContentParts}
-            currentPartIndex={currentPartIndex}
-            setCurrentPartIndex={setCurrentPartIndex}
-          />
-          <div id="requirements">
-            <ul className="list-inside list-disc">
-              <li
-                className={cn(
-                  'flex gap-2 items-center justify-between hover:underline cursor-pointer text-muted-foreground',
-                  {
-                    'text-green-500': selectedCategory !== 0,
-                  }
-                )}
-              >
-                Story Category <CheckCheck size={15} />
-              </li>
-              <li
-                onClick={() => setIsOpen(true)}
-                className={cn(
-                  'flex gap-2 items-center justify-between hover:underline cursor-pointer text-muted-foreground',
-                  {
-                    'text-green-500': storyBlocks?.length! > 0,
-                  }
-                )}
-              >
-                Story Block <CheckCheck size={15} />
-              </li>
-              <li
-                onClick={() => setLang('en')}
-                className="flex gap-2 items-center justify-between hover:underline cursor-pointer text-green-500"
-              >
-                Select Language <CheckCheck size={15} />
-              </li>
-              <li
-                className={cn(
-                  'flex gap-2 items-center justify-between hover:underline cursor-pointer text-muted-foreground',
-                  {
-                    'text-green-500': customPrompt.length > 0,
-                  }
-                )}
-              >
-                Custom Context <CircleQuestionMark size={15} />
-              </li>
-              <li
-                className={cn(
-                  'flex gap-2 items-center justify-between hover:underline cursor-pointer text-muted-foreground',
-                  {
-                    'text-green-500': title.length > 0,
-                  }
-                )}
-              >
-                Story Title <CheckCheck size={15} />
-              </li>
-              <li className="flex gap-2 items-center justify-between hover:underline cursor-pointer text-green-500">
-                Story Parts <CircleQuestionMark size={15} />
-              </li>
-              <li
-                className={cn('flex gap-2 items-center justify-.tsx', {
-                  'text-green-500': synopsis.length > 0,
-                })}
-              >
-                Story Synopsis <CheckCheck size={15} />
-              </li>
-              <li
-                className={cn(
-                  'flex gap-2 items-center justify-between hover:underline cursor-pointer text-muted-foreground',
-                  {
-                    'text-green-500': contentParts[currentPartIndex].content.length > 0,
-                  }
-                )}
-              >
-                Generated Story <CheckCheck size={15} />
-              </li>
-            </ul>
+            <div id="requirements">
+              <ul className="list-inside list-disc">
+                <li
+                  className={cn(
+                    'flex gap-2 items-center justify-between hover:underline cursor-pointer text-muted-foreground',
+                    {
+                      'text-green-500': selectedCategory !== 0,
+                    }
+                  )}
+                >
+                  Story Category <CheckCheck size={15} />
+                </li>
+                <li
+                  onClick={() => setIsOpen(true)}
+                  className={cn(
+                    'flex gap-2 items-center justify-between hover:underline cursor-pointer text-muted-foreground',
+                    {
+                      'text-green-500': storyBlocks?.length! > 0,
+                    }
+                  )}
+                >
+                  Story Block <CheckCheck size={15} />
+                </li>
+                <li
+                  onClick={() => setLang('en')}
+                  className="flex gap-2 items-center justify-between hover:underline cursor-pointer text-green-500"
+                >
+                  Select Language <CheckCheck size={15} />
+                </li>
+                <li
+                  className={cn(
+                    'flex gap-2 items-center justify-between hover:underline cursor-pointer text-muted-foreground',
+                    {
+                      'text-green-500': customPrompt.length > 0,
+                    }
+                  )}
+                >
+                  Custom Context <CircleQuestionMark size={15} />
+                </li>
+                <li
+                  className={cn(
+                    'flex gap-2 items-center justify-between hover:underline cursor-pointer text-muted-foreground',
+                    {
+                      'text-green-500': title.length > 0,
+                    }
+                  )}
+                >
+                  Story Title <CheckCheck size={15} />
+                </li>
+                <li className="flex gap-2 items-center justify-between hover:underline cursor-pointer text-green-500">
+                  Story Parts <CircleQuestionMark size={15} />
+                </li>
+                <li
+                  className={cn('flex gap-2 items-center justify-.tsx', {
+                    'text-green-500': synopsis.length > 0,
+                  })}
+                >
+                  Story Synopsis <CheckCheck size={15} />
+                </li>
+                <li
+                  className={cn(
+                    'flex gap-2 items-center justify-between hover:underline cursor-pointer text-muted-foreground',
+                    {
+                      'text-green-500': contentParts[currentPartIndex].content.length > 0,
+                    }
+                  )}
+                >
+                  Generated Story <CheckCheck size={15} />
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
-      </div>
+      )}
+      {isCreativeMode && (
+        <CreativeMode
+          initialValue={contentParts[currentPartIndex].content}
+          onChange={handleContentChange}
+          onDeactivateCreativeMode={setIsCreativeMode}
+        />
+      )}
       <StoryBlockDialog
         storyBlocksLength={storyBlocks?.length!}
         isOpen={isOpen}

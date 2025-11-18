@@ -4,7 +4,7 @@
 /* eslint-disable quotes */
 import RichTextEditor, { BaseKit } from 'reactjs-tiptap-editor'
 
-import { useCallback, useEffect, useRef } from 'react'
+import { useRef } from 'react'
 import { Blockquote } from 'reactjs-tiptap-editor/blockquote'
 import { Bold } from 'reactjs-tiptap-editor/bold'
 import { Clear } from 'reactjs-tiptap-editor/clear'

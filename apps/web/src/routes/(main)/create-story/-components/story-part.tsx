@@ -1,7 +1,9 @@
 import { Button } from '@story-brew/ui/components/ui/button'
-import { CircleX, Plus, Trash2 } from 'lucide-react'
+import { CircleX, Plus } from 'lucide-react'
 import { Textarea } from '@story-brew/ui/components/ui/textarea'
 import { ScrollArea, ScrollBar } from '@story-brew/ui/components/ui/scroll-area'
+import { ReadOnlyEditor } from '@story-brew/editor/read-only-editor'
+
 import type { ContentPart } from '..'
 
 export function StoryPart({
@@ -36,17 +38,15 @@ export function StoryPart({
   }
 
   const handleDeletePart = (index: number) => {
-    if (contentParts.length === 1) return // Prevent deleting the last part
+    if (contentParts.length === 1) return
     const updatedParts = contentParts.filter((_, i) => i !== index)
     setContentParts(updatedParts)
-    // Adjust current index if needed
     setCurrentPartIndex(Math.max(0, Math.min(currentPartIndex, updatedParts.length - 1)))
   }
 
   return (
     <div className="w-full max-w-4xl mx-auto">
       <div className="space-y-2">
-        {/* <TipTapEditor initialContent={currentPart.content} /> */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <label className="text-sm font-semibold text-foreground">
@@ -62,6 +62,7 @@ export function StoryPart({
             placeholder="Write your story here..."
             className="w-full h-64 p-4 border border-input rounded-lg bg-background text-foreground placeholder-muted-foreground resize-none focus:outline-none focus:ring-2 focus:ring-ring"
           />
+          <ReadOnlyEditor initialValue={currentPart.content} />
         </div>
         <h2 className="text-lg font-semibold text-foreground">Story Parts</h2>
         <ScrollArea className="pb-4 w-full whitespace-nowrap">
