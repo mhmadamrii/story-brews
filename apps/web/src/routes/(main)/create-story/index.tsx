@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { EditorDialog } from './-components/editor-dialog'
+import { CreativeMode } from './-components/creative-mode'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@story-brew/ui/components/ui/tooltip'
 import { SynopsisDialog } from './-components/synopsis-dialog'
 import { StoryBlockDialog } from './-components/story-block-dialog'
@@ -27,7 +27,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@story-brew/ui/components/ui/select'
-import { CreativeMode } from './-components/creative-mode'
 
 export type ContentPart = Array<{
   id: string
@@ -175,7 +174,7 @@ function RouteComponent() {
           <div className="w-full sm:w-1/2 flex flex-col gap-6">
             <div className="flex flex-col gap-2">
               <Label>Category</Label>
-              <div className="flex gap-2 flex-wrap">
+              <div className="flex gap-2 flex-wrap h-[100px]">
                 {STORY_CATEGORY.map((item) => (
                   <div
                     className={cn(
@@ -282,7 +281,7 @@ function RouteComponent() {
           </div>
           <div className="w-full sm:w-1/2 h-full flex flex-col gap-3">
             <h1>Generated Story</h1>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 h-[100px]">
               <Label>Title</Label>
               <Input
                 className="w-full"
@@ -290,14 +289,12 @@ function RouteComponent() {
                 onChange={(e) => setTitleState(e.target.value)}
               />
             </div>
-            <Button onClick={() => setIsCreativeMode(true)} className="w-full">
-              Creative Mode
-            </Button>
             <StoryPart
               contentParts={contentParts}
               setContentParts={setContentParts}
               currentPartIndex={currentPartIndex}
               setCurrentPartIndex={setCurrentPartIndex}
+              onActivateCreativeMode={setIsCreativeMode}
             />
             <div id="requirements">
               <ul className="list-inside list-disc">

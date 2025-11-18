@@ -11,3 +11,9 @@
 .reactjs-tiptap-editor {
   height: 100% !important;
 }
+
+.editor-wrapper .tiptap.ProseMirror {
+  padding: 5px !important;
+  border: none !important;
+  /* background: transparent !important; */
+}

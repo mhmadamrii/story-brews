@@ -5,6 +5,7 @@
 import RichTextEditor, { BaseKit } from 'reactjs-tiptap-editor'
 
 import { Bold } from 'reactjs-tiptap-editor/bold'
+import { useEffect, useState } from 'react'
 import { Clear } from 'reactjs-tiptap-editor/clear'
 import { Color } from 'reactjs-tiptap-editor/color'
 import { FontSize } from 'reactjs-tiptap-editor/fontsize'
@@ -19,6 +20,7 @@ import '../style.css'
 
 export function ReadOnlyEditor({ initialValue }: { initialValue: string }) {
   console.log('initialValue readonly', initialValue)
+  const [initialEditorContent, setInitialEditorContent] = useState(initialValue)
 
   const extensions = [
     BaseKit.configure({
@@ -50,18 +52,24 @@ export function ReadOnlyEditor({ initialValue }: { initialValue: string }) {
     }),
   ]
 
+  useEffect(() => {
+    setInitialEditorContent(initialValue)
+  }, [initialValue])
+
   return (
-    <RichTextEditor
-      output="html"
-      content={initialValue}
-      extensions={extensions}
-      dark
-      disabled
-      toolbar={{
-        render(props, toolbarItems, dom, containerDom) {
-          return ''
-        },
-      }}
-    />
+    <div className="editor-wrapper">
+      <RichTextEditor
+        output="html"
+        content={initialEditorContent}
+        extensions={extensions}
+        dark
+        disabled
+        toolbar={{
+          render(props, toolbarItems, dom, containerDom) {
+            return ''
+          },
+        }}
+      />
+    </div>
   )
 }
