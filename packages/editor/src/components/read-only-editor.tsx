@@ -59,6 +59,7 @@ export function ReadOnlyEditor({ initialValue }: { initialValue: string }) {
   return (
     <div className="editor-wrapper">
       <RichTextEditor
+        key={initialEditorContent.length} // Force re-render when content length changes
         output="html"
         content={initialEditorContent}
         extensions={extensions}
