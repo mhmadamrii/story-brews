@@ -35,38 +35,40 @@ export const storyRouter = {
   getAllMyStoryBlocks: protectedProcedure.query(({ ctx }) => {
     return db.select().from(storyBlocks).where(eq(storyBlocks.userId, ctx.session.user.id))
   }),
-  getStoryById: protectedProcedure.input(z.object({ id: z.string() })).query(async ({ input, ctx }) => {
-    const result = await db
-      .select({
-        story: stories,
-        user: user,
-        part: storyPart,
-      })
-      .from(stories)
-      .innerJoin(user, eq(user.id, stories.userId))
-      .leftJoin(storyPart, eq(storyPart.storyId, stories.id))
-      .leftJoin(
-        storyLikes,
-        and(eq(storyLikes.storyId, stories.id), eq(storyLikes.userId, ctx.session.user.id))
-      )
-      .where(eq(stories.id, input.id))
+  getStoryById: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .query(async ({ input, ctx }) => {
+      const result = await db
+        .select({
+          story: stories,
+          user: user,
+          part: storyPart,
+        })
+        .from(stories)
+        .innerJoin(user, eq(user.id, stories.userId))
+        .leftJoin(storyPart, eq(storyPart.storyId, stories.id))
+        .leftJoin(
+          storyLikes,
+          and(eq(storyLikes.storyId, stories.id), eq(storyLikes.userId, ctx.session.user.id))
+        )
+        .where(eq(stories.id, input.id))
 
-    if (result.length === 0) {
-      return null
-    }
+      if (result.length === 0) {
+        return null
+      }
 
-    const story = {
-      ...result[0]?.story,
-      user: result[0]?.user,
-      // isLiked: !!result[0]?.isLiked,
-      parts: result
-        .filter((row) => row.part !== null)
-        .map((row) => row.part)
-        .sort((a, b) => a!.order - b!.order),
-    }
+      const story = {
+        ...result[0]?.story,
+        user: result[0]?.user,
+        // isLiked: !!result[0]?.isLiked,
+        parts: result
+          .filter((row) => row.part !== null)
+          .map((row) => row.part)
+          .sort((a, b) => a!.order - b!.order),
+      }
 
-    return story
-  }),
+      return story
+    }),
   deleteStoryBlock: protectedProcedure
     .input(
       z.object({

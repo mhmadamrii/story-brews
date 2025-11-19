@@ -1,7 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { CreativeMode } from './-components/creative-mode'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@story-brew/ui/components/ui/tooltip'
-import { SynopsisDialog } from './-components/synopsis-dialog'
 import { StoryBlockDialog } from './-components/story-block-dialog'
 import { EmptyBlock } from './-components/empty-block'
 import { StoryPart } from './-components/story-part'
@@ -12,13 +11,14 @@ import { Button } from '@story-brew/ui/components/ui/button'
 import { Input } from '@story-brew/ui/components/ui/input'
 import { Textarea } from '@story-brew/ui/components/ui/textarea'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { CheckCheck, CircleQuestionMark, PencilLine, Plus, Trash, Trash2 } from 'lucide-react'
+import { PencilLine, Plus, Trash, Trash2 } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { generateStoryWithGemini, generateSynopsisWithGemini } from '@story-brew/ai/gemini-story'
 import { Label } from '@story-brew/ui/components/ui/label'
 import { ScrollArea } from '@story-brew/ui/components/ui/scroll-area'
 import { STORY_CATEGORY } from '@/lib/constants'
 import { useHeader } from '@/lib/header-context'
+import { ReadinessIndicator } from './-components/readiness-indicator'
 
 import {
   Select,
@@ -27,6 +27,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@story-brew/ui/components/ui/select'
+
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@story-brew/ui/components/ui/card'
 
 export type ContentPart = Array<{
   id: string
@@ -168,205 +176,202 @@ function RouteComponent() {
   }, [handleCreateStory, isPublishable, setHeaderAction, setTitle])
 
   return (
-    <section className="flex flex-col gap-3 w-full px-4 py-4">
+    <section className="w-full px-4 py-6 max-w-7xl mx-auto">
       {!isCreativeMode && (
-        <div className="w-full flex flex-col sm:flex-row gap-3">
-          <div className="w-full sm:w-1/2 flex flex-col gap-6">
-            <div className="flex flex-col gap-2">
-              <Label>Category</Label>
-              <div className="flex gap-2 flex-wrap h-[100px]">
-                {STORY_CATEGORY.map((item) => (
-                  <div
-                    className={cn(
-                      'py-2 bg-accent cursor-pointer hover:text-black hover:bg-accent-foreground px-3 border rounded-full',
-                      {
-                        'bg-accent-foreground text-black': selectedCategory === item.id,
-                      }
-                    )}
-                    key={item.id}
-                    onClick={() => setSelectedCategory(item.id)}
-                  >
-                    <h1>{item.name}</h1>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* Left Sidebar - Configuration */}
+          <div className="lg:col-span-4 space-y-6">
+
+            <ReadinessIndicator
+              checks={[
+                { label: 'Select Category', isValid: selectedCategory !== 0 },
+                {
+                  label: 'Add Story Blocks',
+                  isValid: (storyBlocks?.length || 0) > 0,
+                  onClick: () => setIsOpen(true),
+                },
+                { label: 'Select Language', isValid: true, onClick: () => setLang('en') }, // Default is en
+                { label: 'Custom Context (Optional)', isValid: true }, // Optional
+                { label: 'Story Title', isValid: title.length > 0 },
+                { label: 'Story Synopsis', isValid: synopsis.length > 0 },
+                {
+                  label: 'Generated Content',
+                  isValid: contentParts[currentPartIndex].content.length > 0,
+                },
+              ]}
+            />
+            
+            <Card>
+              <CardHeader>
+                <CardTitle>Story Configuration</CardTitle>
+                <CardDescription>Setup your story parameters</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Category Selection */}
+                <div className="space-y-3">
+                  <Label>Category</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {STORY_CATEGORY.map((item) => (
+                      <div
+                        key={item.id}
+                        onClick={() => setSelectedCategory(item.id)}
+                        className={cn(
+                          'cursor-pointer rounded-md border p-3 text-center text-sm transition-all hover:border-primary',
+                          selectedCategory === item.id
+                            ? 'bg-primary text-primary-foreground border-primary'
+                            : 'bg-card hover:bg-accent'
+                        )}
+                      >
+                        {item.name}
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </div>
-            <div className="flex flex-col gap-2">
-              <div className="flex justify-between items-center">
-                <Label>Story Blocks</Label>
-                <div className="flex gap-2">
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="destructive"
-                        size="icon"
-                        onClick={() => deleteAllBlocks()}
-                        className="cursor-pointer"
-                      >
-                        <Trash2 />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Remove All</p>
-                    </TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant="secondary"
-                        size="icon"
-                        onClick={() => setIsOpen(true)}
-                        className="cursor-pointer"
-                      >
-                        <Plus />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p>Add New Block</p>
-                    </TooltipContent>
-                  </Tooltip>
                 </div>
-              </div>
-              <ScrollArea className="h-[200px] border rounded-sm py-1 px-2">
-                {storyBlocks?.length == 0 && <EmptyBlock />}
-                <div className="w-full flex flex-col gap-2">
-                  {storyBlocks?.map((item) => (
-                    <div key={item.id} className="flex w-full justify-between items-center">
-                      <h1>{item.content}</h1>
+
+                {/* Story Blocks */}
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <Label>Story Blocks</Label>
+                    <div className="flex gap-1">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                            onClick={() => deleteAllBlocks()}
+                          >
+                            <Trash2 size={16} />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Remove All</TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => setIsOpen(true)}
+                          >
+                            <Plus size={16} />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Add New Block</TooltipContent>
+                      </Tooltip>
+                    </div>
+                  </div>
+
+                  <ScrollArea className="h-[180px] rounded-md border bg-muted/30 p-2">
+                    {storyBlocks?.length === 0 && <EmptyBlock />}
+                    <div className="space-y-2">
+                      {storyBlocks?.map((item) => (
+                        <div
+                          key={item.id}
+                          className="group flex items-center justify-between rounded-md border bg-card p-2 text-sm shadow-sm"
+                        >
+                          <span className="line-clamp-1">{item.content}</span>
+                          <Button
+                            onClick={() => deleteStoryBlock({ id: item.id })}
+                            size="icon"
+                            variant="ghost"
+                            className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <Trash size={14} />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                </div>
+
+                {/* Language & Context */}
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label>Language</Label>
+                    <Select onValueChange={(value) => setLang(value as 'en' | 'id')} value={lang}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select Language" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="en">English</SelectItem>
+                        <SelectItem value="id">Indonesia</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Custom Context</Label>
+                    <Textarea
+                      value={customPrompt}
+                      onChange={(e) => setCustomPrompt(e.target.value)}
+                      placeholder="Add specific instructions or context for the AI..."
+                      className="min-h-[120px] resize-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-2">
+                  <Button onClick={handleGenerate} className="w-full" size="lg">
+                    Generate Story Part
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+          </div>
+
+          {/* Right Panel - Editor */}
+          <div className="lg:col-span-8 space-y-6">
+            <Card className="h-full">
+              <CardHeader>
+                <CardTitle>Story Editor</CardTitle>
+                <CardDescription>Write and edit your story content</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-2">
+                  <Label className="text-lg font-semibold">Story Title</Label>
+                  <Input
+                    className="text-lg font-medium h-12"
+                    placeholder="Enter your story title..."
+                    value={title}
+                    onChange={(e) => setTitleState(e.target.value)}
+                  />
+                </div>
+
+                <div className="border rounded-md p-4 bg-muted/10">
+                  <StoryPart
+                    contentParts={contentParts}
+                    setContentParts={setContentParts}
+                    currentPartIndex={currentPartIndex}
+                    setCurrentPartIndex={setCurrentPartIndex}
+                    onActivateCreativeMode={setIsCreativeMode}
+                  />
+                </div>
+
+                <div className="flex items-start gap-4">
+                  <div className="flex-1 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label>Synopsis</Label>
                       <Button
-                        onClick={() => deleteStoryBlock({ id: item.id })}
-                        className="cursor-pointer"
-                        size="icon"
                         variant="ghost"
+                        size="sm"
+                        className="h-6 text-xs"
+                        onClick={handleGenerateSynopsis}
                       >
-                        <Trash className="cursor-pointer" />
+                        Auto-generate
                       </Button>
                     </div>
-                  ))}
+                    <Textarea
+                      value={synopsis}
+                      onChange={(e) => setSynopsis(e.target.value)}
+                      placeholder="Story synopsis..."
+                      className="min-h-[100px]"
+                    />
+                  </div>
                 </div>
-              </ScrollArea>
-            </div>
-            <div className="w-full flex flex-col gap-4">
-              <div className="w-full flex flex-col gap-2">
-                <Label>Select Language</Label>
-                <Select onValueChange={(value) => setLang(value as 'en' | 'id')}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Language" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="en">English</SelectItem>
-                    <SelectItem value="id">Indonesia</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="w-full flex flex-col gap-2">
-                <Label>Custom Context</Label>
-                <Textarea
-                  value={customPrompt}
-                  onChange={(e) => setCustomPrompt(e.target.value)}
-                  className="w-full min-h-[200px]"
-                />
-              </div>
-              <div className="flex gap-2">
-                <Button onClick={handleGenerate} className="cursor-pointer w-full sm:w-1/2">
-                  Generate Story
-                </Button>
-                <SynopsisDialog
-                  synopsis={synopsis}
-                  handleGenerateSynopsis={handleGenerateSynopsis}
-                  onSynopsisChange={setSynopsis}
-                />
-              </div>
-            </div>
-          </div>
-          <div className="w-full sm:w-1/2 h-full flex flex-col gap-3">
-            <h1>Generated Story</h1>
-            <div className="flex flex-col gap-2 h-[100px]">
-              <Label>Title</Label>
-              <Input
-                className="w-full"
-                value={title}
-                onChange={(e) => setTitleState(e.target.value)}
-              />
-            </div>
-            <StoryPart
-              contentParts={contentParts}
-              setContentParts={setContentParts}
-              currentPartIndex={currentPartIndex}
-              setCurrentPartIndex={setCurrentPartIndex}
-              onActivateCreativeMode={setIsCreativeMode}
-            />
-            <div id="requirements">
-              <ul className="list-inside list-disc">
-                <li
-                  className={cn(
-                    'flex gap-2 items-center justify-between hover:underline cursor-pointer text-muted-foreground',
-                    {
-                      'text-green-500': selectedCategory !== 0,
-                    }
-                  )}
-                >
-                  Story Category <CheckCheck size={15} />
-                </li>
-                <li
-                  onClick={() => setIsOpen(true)}
-                  className={cn(
-                    'flex gap-2 items-center justify-between hover:underline cursor-pointer text-muted-foreground',
-                    {
-                      'text-green-500': storyBlocks?.length! > 0,
-                    }
-                  )}
-                >
-                  Story Block <CheckCheck size={15} />
-                </li>
-                <li
-                  onClick={() => setLang('en')}
-                  className="flex gap-2 items-center justify-between hover:underline cursor-pointer text-green-500"
-                >
-                  Select Language <CheckCheck size={15} />
-                </li>
-                <li
-                  className={cn(
-                    'flex gap-2 items-center justify-between hover:underline cursor-pointer text-muted-foreground',
-                    {
-                      'text-green-500': customPrompt.length > 0,
-                    }
-                  )}
-                >
-                  Custom Context <CircleQuestionMark size={15} />
-                </li>
-                <li
-                  className={cn(
-                    'flex gap-2 items-center justify-between hover:underline cursor-pointer text-muted-foreground',
-                    {
-                      'text-green-500': title.length > 0,
-                    }
-                  )}
-                >
-                  Story Title <CheckCheck size={15} />
-                </li>
-                <li className="flex gap-2 items-center justify-between hover:underline cursor-pointer text-green-500">
-                  Story Parts <CircleQuestionMark size={15} />
-                </li>
-                <li
-                  className={cn('flex gap-2 items-center justify-.tsx', {
-                    'text-green-500': synopsis.length > 0,
-                  })}
-                >
-                  Story Synopsis <CheckCheck size={15} />
-                </li>
-                <li
-                  className={cn(
-                    'flex gap-2 items-center justify-between hover:underline cursor-pointer text-muted-foreground',
-                    {
-                      'text-green-500': contentParts[currentPartIndex].content.length > 0,
-                    }
-                  )}
-                >
-                  Generated Story <CheckCheck size={15} />
-                </li>
-              </ul>
-            </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       )}
