@@ -9,6 +9,7 @@ import { PopularStories } from './-components/popular-stories'
 import { Button } from '@story-brew/ui/components/ui/button'
 import { Bookmark, Eye, Heart, User } from 'lucide-react'
 import { formatDate } from '@story-brew/ui/lib/utils'
+import { authorSearchSchema, StoryFilter } from './-components/story-filter'
 
 import {
   Card,
@@ -19,16 +20,9 @@ import {
   CardTitle,
 } from '@story-brew/ui/components/ui/card'
 
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@story-brew/ui/components/ui/select'
-
 export const Route = createFileRoute('/(main)/home/')({
   component: RouteComponent,
+  validateSearch: authorSearchSchema,
 })
 
 type StoryData = {
@@ -44,14 +38,13 @@ type StoryData = {
 }
 
 function RouteComponent() {
+  const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const trpc = useTRPC()
 
   const [stories, setStories] = useState<Array<StoryData>>()
   const [likedStories, setLikedStories] = useState(new Set())
   const [savedStories, setSavedStories] = useState(new Set())
-
-  const trpc = useTRPC()
-  const navigate = useNavigate()
 
   const { setTitle } = useHeader()
   const { data: storiesData } = useQuery(trpc.storyRouter.getAllStories.queryOptions())
@@ -68,7 +61,7 @@ function RouteComponent() {
 
   const { mutate: likeStory } = useMutation(
     trpc.storyRouter.toggleLike.mutationOptions({
-      onSuccess: (r) => {
+      onSuccess: () => {
         queryClient.invalidateQueries()
       },
     })
@@ -142,30 +135,7 @@ function RouteComponent() {
     <div className="w-full px-4 pt-4">
       <section className="flex flex-col gap-4">
         <PopularStories />
-        <div className="flex gap-2 w-full justify-end items-center">
-          <div className="flex gap-2">
-            <Select>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Author" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="light">Light</SelectItem>
-                <SelectItem value="dark">Dark</SelectItem>
-                <SelectItem value="system">System</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="light">Light</SelectItem>
-                <SelectItem value="dark">Dark</SelectItem>
-                <SelectItem value="system">System</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
+        <StoryFilter />
         <div id="story-list" className="grid grid-cols-1 md:grid-cols-3 sm:grid-cols-2 gap-4">
           {stories?.map((item) => (
             <Card key={item.id} className="flex flex-col">

@@ -45,7 +45,10 @@ export function StoryCard({ story }: StoryCardProps) {
       whileHover={{ y: -1 }}
       className="group relative overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-shadow duration-300 hover:shadow-lg"
     >
-      <motion.div variants={itemVariants} className="border-b border-border from-primary/5 to-primary/10 p-4">
+      <motion.div
+        variants={itemVariants}
+        className="border-b border-border from-primary/5 to-primary/10 p-4"
+      >
         <h3 className="text-balance font-semibold text-card-foreground line-clamp-2">
           {story.title}
         </h3>
@@ -53,7 +56,10 @@ export function StoryCard({ story }: StoryCardProps) {
       <motion.div variants={itemVariants} className="p-4">
         <p className="text-sm text-muted-foreground line-clamp-3">{story.synopsis}</p>
       </motion.div>
-      <motion.div variants={itemVariants} className="grid grid-cols-2 gap-3 border-t border-border px-4 py-3">
+      <motion.div
+        variants={itemVariants}
+        className="grid grid-cols-2 gap-3 border-t border-border px-4 py-3"
+      >
         <div className="flex items-center gap-2">
           <Eye className="h-4 w-4 text-muted-foreground" />
           <div className="flex flex-col">

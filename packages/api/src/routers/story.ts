@@ -22,8 +22,14 @@ export const storyRouter = {
       })
       .from(stories)
       .innerJoin(user, eq(user.id, stories.userId))
-      .leftJoin(bookmark, and(eq(bookmark.storyId, stories.id), eq(bookmark.userId, ctx.session.user.id)))
-      .leftJoin(storyLikes, and(eq(storyLikes.storyId, stories.id), eq(storyLikes.userId, ctx.session.user.id)))
+      .leftJoin(
+        bookmark,
+        and(eq(bookmark.storyId, stories.id), eq(bookmark.userId, ctx.session.user.id))
+      )
+      .leftJoin(
+        storyLikes,
+        and(eq(storyLikes.storyId, stories.id), eq(storyLikes.userId, ctx.session.user.id))
+      )
       .orderBy(desc(stories.createdAt))
   }),
   getAllMyStoryBlocks: protectedProcedure.query(({ ctx }) => {
@@ -39,7 +45,10 @@ export const storyRouter = {
       .from(stories)
       .innerJoin(user, eq(user.id, stories.userId))
       .leftJoin(storyPart, eq(storyPart.storyId, stories.id))
-      .leftJoin(storyLikes, and(eq(storyLikes.storyId, stories.id), eq(storyLikes.userId, ctx.session.user.id)))
+      .leftJoin(
+        storyLikes,
+        and(eq(storyLikes.storyId, stories.id), eq(storyLikes.userId, ctx.session.user.id))
+      )
       .where(eq(stories.id, input.id))
 
     if (result.length === 0) {
@@ -141,7 +150,9 @@ export const storyRouter = {
       const existingLike = await db
         .select()
         .from(storyLikes)
-        .where(and(eq(storyLikes.storyId, input.storyId), eq(storyLikes.userId, ctx.session.user.id)))
+        .where(
+          and(eq(storyLikes.storyId, input.storyId), eq(storyLikes.userId, ctx.session.user.id))
+        )
 
       if (existingLike.length > 0) {
         await db.transaction(async (tx) => {
@@ -154,7 +165,9 @@ export const storyRouter = {
         return { liked: false }
       } else {
         await db.transaction(async (tx) => {
-          await tx.insert(storyLikes).values({ userId: ctx.session.user.id, storyId: input.storyId })
+          await tx
+            .insert(storyLikes)
+            .values({ userId: ctx.session.user.id, storyId: input.storyId })
           await tx
             .update(stories)
             .set({ likes: sql`${stories.likes} + 1` })
