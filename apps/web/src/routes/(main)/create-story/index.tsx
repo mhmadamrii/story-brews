@@ -11,7 +11,7 @@ import { Button } from '@story-brew/ui/components/ui/button'
 import { Input } from '@story-brew/ui/components/ui/input'
 import { Textarea } from '@story-brew/ui/components/ui/textarea'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { PencilLine, Plus, Trash, Trash2 } from 'lucide-react'
+import { CircleX, PencilLine, Plus, Trash, Trash2, Loader2 } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { generateStoryWithGemini, generateSynopsisWithGemini } from '@story-brew/ai/gemini-story'
 import { Label } from '@story-brew/ui/components/ui/label'
@@ -98,26 +98,37 @@ function RouteComponent() {
     })
   )
 
+  const [isGenerating, setIsGenerating] = useState(false);
+
   const handleGenerate = async () => {
+    setIsGenerating(true);
     const previousContent = contentParts
       .slice(0, currentPartIndex)
       .map((part) => part.content)
-      .join('\n\n')
+      .join('\n\n');
 
-    const res = await generateStoryWithGemini({
-      category: STORY_CATEGORY[selectedCategory - 1].name,
-      customPrompt,
-      storyBlocks: storyBlocks?.map((item) => item.content) || [],
-      lang,
-      previousContent,
-    })
+    try {
+      const res = await generateStoryWithGemini({
+        category: STORY_CATEGORY[selectedCategory - 1].name,
+        customPrompt,
+        storyBlocks: storyBlocks?.map((item) => item.content) || [],
+        lang,
+        previousContent,
+      });
 
-    console.log('res', res)
+      console.log('res', res);
 
-    if (res) {
-      const updatedParts = [...contentParts]
-      updatedParts[currentPartIndex].content = res
-      setContentParts(updatedParts)
+      if (res) {
+        const updatedParts = [...contentParts];
+        updatedParts[currentPartIndex].content = res;
+        setContentParts(updatedParts);
+        toast.success('Story part generated');
+      }
+    } catch (error: any) {
+      console.error(error);
+      toast.error(`Failed to generate story: ${error?.message || 'Unknown error'}`);
+    } finally {
+      setIsGenerating(false);
     }
   }
 
@@ -313,10 +324,13 @@ function RouteComponent() {
                 </div>
 
                 <div className="pt-2">
-                  <Button 
-                  disabled={!selectedCategory || !storyBlocks?.length}
-                  onClick={handleGenerate} className="w-full cursor-pointer" size="lg">
-                    Generate Story Part
+                   <Button
+                     disabled={!selectedCategory || !storyBlocks?.length || isGenerating}
+                     onClick={handleGenerate}
+                     className="w-full cursor-pointer flex items-center justify-center gap-2"
+                     size="lg"
+                   >
+                     {isGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Generate Story Part'}
                   </Button>
                 </div>
               </CardContent>
