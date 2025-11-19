@@ -99,7 +99,7 @@ export function StoryPart({
                 </CardContent>
               </Card>
             ))}
-            
+
             <Card
               onClick={handleAddPart}
               className="w-48 shrink-0 cursor-pointer border-dashed hover:bg-accent/50 hover:border-primary/50 transition-all flex items-center justify-center"

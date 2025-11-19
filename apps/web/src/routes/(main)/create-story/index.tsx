@@ -98,14 +98,14 @@ function RouteComponent() {
     })
   )
 
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false)
 
   const handleGenerate = async () => {
-    setIsGenerating(true);
+    setIsGenerating(true)
     const previousContent = contentParts
       .slice(0, currentPartIndex)
       .map((part) => part.content)
-      .join('\n\n');
+      .join('\n\n')
 
     try {
       const res = await generateStoryWithGemini({
@@ -114,21 +114,21 @@ function RouteComponent() {
         storyBlocks: storyBlocks?.map((item) => item.content) || [],
         lang,
         previousContent,
-      });
+      })
 
-      console.log('res', res);
+      console.log('res', res)
 
       if (res) {
-        const updatedParts = [...contentParts];
-        updatedParts[currentPartIndex].content = res;
-        setContentParts(updatedParts);
-        toast.success('Story part generated');
+        const updatedParts = [...contentParts]
+        updatedParts[currentPartIndex].content = res
+        setContentParts(updatedParts)
+        toast.success('Story part generated')
       }
     } catch (error: any) {
-      console.error(error);
-      toast.error(`Failed to generate story: ${error?.message || 'Unknown error'}`);
+      console.error(error)
+      toast.error(`Failed to generate story: ${error?.message || 'Unknown error'}`)
     } finally {
-      setIsGenerating(false);
+      setIsGenerating(false)
     }
   }
 
@@ -212,7 +212,7 @@ function RouteComponent() {
                 },
               ]}
             />
-            
+
             <Card>
               <CardHeader>
                 <CardTitle>Story Configuration</CardTitle>
@@ -302,7 +302,7 @@ function RouteComponent() {
                   <div className="space-y-2">
                     <Label>Language</Label>
                     <Select onValueChange={(value) => setLang(value as 'en' | 'id')} value={lang}>
-                      <SelectTrigger className='w-full'>
+                      <SelectTrigger className="w-full">
                         <SelectValue placeholder="Select Language" />
                       </SelectTrigger>
                       <SelectContent>
@@ -324,18 +324,21 @@ function RouteComponent() {
                 </div>
 
                 <div className="pt-2">
-                   <Button
-                     disabled={!selectedCategory || !storyBlocks?.length || isGenerating}
-                     onClick={handleGenerate}
-                     className="w-full cursor-pointer flex items-center justify-center gap-2"
-                     size="lg"
-                   >
-                     {isGenerating ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Generate Story Part'}
+                  <Button
+                    disabled={!selectedCategory || !storyBlocks?.length || isGenerating}
+                    onClick={handleGenerate}
+                    className="w-full cursor-pointer flex items-center justify-center gap-2"
+                    size="lg"
+                  >
+                    {isGenerating ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      'Generate Story Part'
+                    )}
                   </Button>
                 </div>
               </CardContent>
             </Card>
-
           </div>
 
           {/* Right Panel - Editor */}
