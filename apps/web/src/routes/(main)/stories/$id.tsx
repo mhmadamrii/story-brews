@@ -7,6 +7,7 @@ import { BookOpen, Calendar } from 'lucide-react'
 import { Badge } from '@story-brew/ui/components/ui/badge'
 import { formatDate } from '@story-brew/ui/lib/utils'
 import { Separator } from '@story-brew/ui/components/ui/separator'
+import { ReadOnlyEditor } from '@story-brew/editor/read-only-editor'
 
 export const Route = createFileRoute('/(main)/stories/$id')({
   component: RouteComponent,
@@ -67,7 +68,7 @@ function RouteComponent() {
                 <CardTitle>Part {index + 1}</CardTitle>
               </CardHeader>
               <CardContent>
-                <p>{part?.content}</p>
+                <ReadOnlyEditor initialValue={part?.content ?? ''} />
               </CardContent>
             </Card>
           ))}

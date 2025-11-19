@@ -35,7 +35,7 @@ export const storyRouter = {
   getAllMyStoryBlocks: protectedProcedure.query(({ ctx }) => {
     return db.select().from(storyBlocks).where(eq(storyBlocks.userId, ctx.session.user.id))
   }),
-  getStoryById: protectedProcedure.input(z.object({ id: z.string() })).query(async ({ input }) => {
+  getStoryById: protectedProcedure.input(z.object({ id: z.string() })).query(async ({ input, ctx }) => {
     const result = await db
       .select({
         story: stories,
@@ -58,7 +58,7 @@ export const storyRouter = {
     const story = {
       ...result[0]?.story,
       user: result[0]?.user,
-      isLiked: !!result[0]?.isLiked,
+      // isLiked: !!result[0]?.isLiked,
       parts: result
         .filter((row) => row.part !== null)
         .map((row) => row.part)
