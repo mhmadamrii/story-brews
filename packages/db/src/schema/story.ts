@@ -40,6 +40,13 @@ export const bookmark = pgTable('bookmark', {
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 })
 
+export const storyLikes = pgTable('story_likes', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  storyId: uuid('story_id').references(() => stories.id, { onDelete: 'cascade' }),
+  userId: text('user_id').references(() => user.id, { onDelete: 'cascade' }),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+})
+
 export const storyRelations = relations(stories, ({ many, one }) => ({
   blocks: many(storyBlocks),
   parts: many(storyPart),
@@ -48,6 +55,7 @@ export const storyRelations = relations(stories, ({ many, one }) => ({
     references: [user.id],
   }),
   bookmarks: many(bookmark),
+  likes: many(storyLikes),
 }))
 
 export const storyBlockRelations = relations(storyBlocks, ({ one }) => ({
@@ -75,6 +83,17 @@ export const bookmarkRelations = relations(bookmark, ({ one }) => ({
   }),
   user: one(user, {
     fields: [bookmark.userId],
+    references: [user.id],
+  }),
+}))
+
+export const storyLikesRelations = relations(storyLikes, ({ one }) => ({
+  story: one(stories, {
+    fields: [storyLikes.storyId],
+    references: [stories.id],
+  }),
+  user: one(user, {
+    fields: [storyLikes.userId],
     references: [user.id],
   }),
 }))

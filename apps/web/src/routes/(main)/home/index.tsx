@@ -66,6 +66,14 @@ function RouteComponent() {
     })
   )
 
+  const { mutate: likeStory } = useMutation(
+    trpc.storyRouter.toggleLike.mutationOptions({
+      onSuccess: (r) => {
+        queryClient.invalidateQueries()
+      },
+    })
+  )
+
   const truncateText = (text: string, maxLength = 150) => {
     if (text.length <= maxLength) return text
     return text.slice(0, maxLength).trim() + '...'
@@ -78,6 +86,8 @@ function RouteComponent() {
   }
 
   const toggleLike = (id: string) => {
+    likeStory({ storyId: id })
+
     setLikedStories((prev) => {
       const newSet = new Set(prev)
       if (newSet.has(id)) {
@@ -117,13 +127,14 @@ function RouteComponent() {
       setStories(
         storiesData.map((s) => ({
           ...s.stories,
-          likes: 5,
+          likes: s.stories.likes ?? 0,
           author: s.user.name,
           // content: s.story_part.content,
           synopsis: s.stories.synopsis,
           isBookmarked: s.bookmark?.id ? true : false,
         }))
       )
+      setLikedStories(new Set(storiesData.filter((s) => s.isLiked).map((s) => s.stories.id)))
     }
   }, [storiesData])
 

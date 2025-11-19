@@ -56,11 +56,17 @@ The API is running at [http://localhost:3000](http://localhost:3000).
 story-brew/
 ├── apps/
 │   ├── web/         # Frontend application (React + TanStack Start)
-│   └── server/      # Backend API (Hono, TRPC)
+│   ├── server/      # Backend API (Hono, TRPC)
+│   ├── cli/         # CLI tool for package generation
+│   └── fumadocs/    # Documentation site
 ├── packages/
 │   ├── api/         # API layer / business logic
 │   ├── auth/        # Authentication configuration & logic
-│   └── db/          # Database schema & queries
+│   ├── db/          # Database schema & queries
+│   ├── ai/          # AI integration (Google GenAI, Groq)
+│   ├── editor/      # Rich text editor components
+│   ├── ui/          # Shared UI components
+│   └── typescript-config/ # Shared TypeScript configuration
 ```
 
 ## Available Scripts

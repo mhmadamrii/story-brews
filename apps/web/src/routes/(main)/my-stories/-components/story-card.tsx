@@ -3,6 +3,7 @@ import { Button } from '@story-brew/ui/components/ui/button'
 import { useState } from 'react'
 import { AlertDeleteStory } from './alert-delete-story'
 import { Link } from '@tanstack/react-router'
+import { motion } from 'motion/react'
 
 interface Story {
   id: string
@@ -21,17 +22,38 @@ interface StoryCardProps {
 export function StoryCard({ story }: StoryCardProps) {
   const [isOpenDelete, setIsOpenDelete] = useState(false)
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  }
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 10 },
+    visible: { opacity: 1, y: 0 },
+  }
+
   return (
-    <div className="group relative overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-all duration-300 hover:shadow-lg">
-      <div className="border-b border-border from-primary/5 to-primary/10 p-4">
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      whileHover={{ y: -1 }}
+      className="group relative overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-shadow duration-300 hover:shadow-lg"
+    >
+      <motion.div variants={itemVariants} className="border-b border-border from-primary/5 to-primary/10 p-4">
         <h3 className="text-balance font-semibold text-card-foreground line-clamp-2">
           {story.title}
         </h3>
-      </div>
-      <div className="p-4">
+      </motion.div>
+      <motion.div variants={itemVariants} className="p-4">
         <p className="text-sm text-muted-foreground line-clamp-3">{story.synopsis}</p>
-      </div>
-      <div className="grid grid-cols-2 gap-3 border-t border-border px-4 py-3">
+      </motion.div>
+      <motion.div variants={itemVariants} className="grid grid-cols-2 gap-3 border-t border-border px-4 py-3">
         <div className="flex items-center gap-2">
           <Eye className="h-4 w-4 text-muted-foreground" />
           <div className="flex flex-col">
@@ -60,8 +82,8 @@ export function StoryCard({ story }: StoryCardProps) {
             </span>
           </div>
         </div>
-      </div>
-      <div className="border-t border-border px-4 py-3 flex gap-2">
+      </motion.div>
+      <motion.div variants={itemVariants} className="border-t border-border px-4 py-3 flex gap-2">
         <Button variant="outline" size="sm" className="flex-1" asChild>
           <Link
             to={`/stories/$id`}
@@ -73,7 +95,7 @@ export function StoryCard({ story }: StoryCardProps) {
           </Link>
         </Button>
         <AlertDeleteStory isOpen={isOpenDelete} setIsOpen={setIsOpenDelete} storyId={story.id} />
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   )
 }

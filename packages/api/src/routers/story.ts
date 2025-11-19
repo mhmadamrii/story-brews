@@ -1,7 +1,7 @@
 import z from 'zod'
 
-import { db, eq, and, desc } from '@story-brew/db'
-import { bookmark, stories, storyBlocks, storyPart } from '@story-brew/db/schema/story'
+import { db, eq, and, desc, sql } from '@story-brew/db'
+import { bookmark, stories, storyBlocks, storyLikes, storyPart } from '@story-brew/db/schema/story'
 import { protectedProcedure } from '..'
 import { user } from '@story-brew/db/schema/auth'
 
@@ -12,12 +12,18 @@ export const storyRouter = {
   getPopularStories: protectedProcedure.query(() => {
     return db.select().from(stories)
   }),
-  getAllStories: protectedProcedure.query(() => {
+  getAllStories: protectedProcedure.query(({ ctx }) => {
     return db
-      .select()
+      .select({
+        stories: stories,
+        user: user,
+        bookmark: bookmark,
+        isLiked: storyLikes.id,
+      })
       .from(stories)
       .innerJoin(user, eq(user.id, stories.userId))
-      .leftJoin(bookmark, and(eq(bookmark.storyId, stories.id), eq(bookmark.userId, user.id)))
+      .leftJoin(bookmark, and(eq(bookmark.storyId, stories.id), eq(bookmark.userId, ctx.session.user.id)))
+      .leftJoin(storyLikes, and(eq(storyLikes.storyId, stories.id), eq(storyLikes.userId, ctx.session.user.id)))
       .orderBy(desc(stories.createdAt))
   }),
   getAllMyStoryBlocks: protectedProcedure.query(({ ctx }) => {
@@ -33,6 +39,7 @@ export const storyRouter = {
       .from(stories)
       .innerJoin(user, eq(user.id, stories.userId))
       .leftJoin(storyPart, eq(storyPart.storyId, stories.id))
+      .leftJoin(storyLikes, and(eq(storyLikes.storyId, stories.id), eq(storyLikes.userId, ctx.session.user.id)))
       .where(eq(stories.id, input.id))
 
     if (result.length === 0) {
@@ -42,6 +49,7 @@ export const storyRouter = {
     const story = {
       ...result[0]?.story,
       user: result[0]?.user,
+      isLiked: !!result[0]?.isLiked,
       parts: result
         .filter((row) => row.part !== null)
         .map((row) => row.part)
@@ -126,5 +134,33 @@ export const storyRouter = {
 
         return story
       })
+    }),
+  toggleLike: protectedProcedure
+    .input(z.object({ storyId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const existingLike = await db
+        .select()
+        .from(storyLikes)
+        .where(and(eq(storyLikes.storyId, input.storyId), eq(storyLikes.userId, ctx.session.user.id)))
+
+      if (existingLike.length > 0) {
+        await db.transaction(async (tx) => {
+          await tx.delete(storyLikes).where(eq(storyLikes.id, existingLike[0]!.id))
+          await tx
+            .update(stories)
+            .set({ likes: sql`${stories.likes} - 1` })
+            .where(eq(stories.id, input.storyId))
+        })
+        return { liked: false }
+      } else {
+        await db.transaction(async (tx) => {
+          await tx.insert(storyLikes).values({ userId: ctx.session.user.id, storyId: input.storyId })
+          await tx
+            .update(stories)
+            .set({ likes: sql`${stories.likes} + 1` })
+            .where(eq(stories.id, input.storyId))
+        })
+        return { liked: true }
+      }
     }),
 }
