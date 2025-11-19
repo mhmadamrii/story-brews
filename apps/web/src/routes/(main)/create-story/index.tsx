@@ -112,6 +112,8 @@ function RouteComponent() {
       previousContent,
     })
 
+    console.log('res', res)
+
     if (res) {
       const updatedParts = [...contentParts]
       updatedParts[currentPartIndex].content = res
@@ -176,12 +178,11 @@ function RouteComponent() {
   }, [handleCreateStory, isPublishable, setHeaderAction, setTitle])
 
   return (
-    <section className="w-full px-4 py-6 max-w-7xl mx-auto">
+    <section className="w-full px-4 py-6">
       {!isCreativeMode && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           {/* Left Sidebar - Configuration */}
           <div className="lg:col-span-4 space-y-6">
-
             <ReadinessIndicator
               checks={[
                 { label: 'Select Category', isValid: selectedCategory !== 0 },
@@ -290,7 +291,7 @@ function RouteComponent() {
                   <div className="space-y-2">
                     <Label>Language</Label>
                     <Select onValueChange={(value) => setLang(value as 'en' | 'id')} value={lang}>
-                      <SelectTrigger>
+                      <SelectTrigger className='w-full'>
                         <SelectValue placeholder="Select Language" />
                       </SelectTrigger>
                       <SelectContent>
@@ -312,7 +313,9 @@ function RouteComponent() {
                 </div>
 
                 <div className="pt-2">
-                  <Button onClick={handleGenerate} className="w-full" size="lg">
+                  <Button 
+                  disabled={!selectedCategory || !storyBlocks?.length}
+                  onClick={handleGenerate} className="w-full cursor-pointer" size="lg">
                     Generate Story Part
                   </Button>
                 </div>

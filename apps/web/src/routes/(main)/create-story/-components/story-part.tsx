@@ -1,11 +1,11 @@
 'use no memo'
 
 import { Button } from '@story-brew/ui/components/ui/button'
-import { useEffect, useState } from 'react'
 import { CircleX, PencilLine, Plus } from 'lucide-react'
-import { Textarea } from '@story-brew/ui/components/ui/textarea'
 import { ScrollArea, ScrollBar } from '@story-brew/ui/components/ui/scroll-area'
 import { ReadOnlyEditor } from '@story-brew/editor/read-only-editor'
+import { Card, CardContent } from '@story-brew/ui/components/ui/card'
+import { cn } from '@story-brew/ui/lib/utils'
 
 import type { ContentPart } from '..'
 
@@ -23,13 +23,6 @@ export function StoryPart({
   onActivateCreativeMode: React.Dispatch<React.SetStateAction<boolean>>
 }) {
   const currentPart = contentParts[currentPartIndex]
-  const [initialEditorContent, setInitialEditorContent] = useState(currentPart.content)
-
-  const handleContentChange = (content: string) => {
-    const updatedParts = [...contentParts]
-    updatedParts[currentPartIndex].content = content
-    setContentParts(updatedParts)
-  }
 
   const handleAddPart = () => {
     const newPart = {
@@ -49,62 +42,73 @@ export function StoryPart({
     setCurrentPartIndex(Math.max(0, Math.min(currentPartIndex, updatedParts.length - 1)))
   }
 
-  console.log('current part', currentPart.content)
-
   return (
-    <div className="w-full max-w-4xl mx-auto">
+    <div className="w-full max-w-4xl space-y-6">
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <label className="text-sm font-semibold text-foreground">
             Part {currentPartIndex + 1} of {contentParts.length}
           </label>
-          <Button onClick={() => onActivateCreativeMode(true)} size="icon">
-            <PencilLine />
+          <Button onClick={() => onActivateCreativeMode(true)} size="icon" variant="outline">
+            <PencilLine className="h-4 w-4" />
           </Button>
         </div>
-        <ScrollArea className="h-[200px] w-full">
-          <ReadOnlyEditor initialValue={currentPart.content} />
-        </ScrollArea>
+        <Card className="overflow-hidden">
+          <ScrollArea className="h-[300px] w-full">
+            <div className="p-0">
+              <ReadOnlyEditor initialValue={currentPart.content} />
+            </div>
+          </ScrollArea>
+        </Card>
+      </div>
+
+      <div className="space-y-3">
         <h2 className="text-sm font-semibold text-foreground">Story Parts</h2>
-        <ScrollArea className="pb-4 w-full whitespace-nowrap">
-          <div className="flex gap-2">
+        <ScrollArea id="story-part-selection" className="w-full whitespace-nowrap pb-4">
+          <div className="flex gap-4">
             {contentParts.map((part, index) => (
-              <div
+              <Card
                 key={part.id}
-                className={`p-3 w-40 rounded-lg border transition-colors cursor-pointer ${
-                  currentPartIndex === index ? 'bg-accent border-primary' : ''
-                }`}
+                className={cn(
+                  'w-48 shrink-0 cursor-pointer transition-all hover:shadow-md',
+                  currentPartIndex === index
+                    ? 'border-primary bg-accent/50 ring-1 ring-primary/20'
+                    : 'hover:border-primary/50'
+                )}
                 onClick={() => setCurrentPartIndex(index)}
               >
-                <div className="flex justify-between h-full group relative">
-                  <div className="w-full">
-                    <div className="font-medium text-foreground">Part {index + 1}</div>
-                    <div className="text-xs text-muted-foreground truncate line-clamp-2 mt-1">
-                      {part.content.length > 0 ? part.content.substring(0, 50) : 'Empty'}
-                    </div>
+                <CardContent className="p-3 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium text-sm">Part {index + 1}</span>
+                    <Button
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleDeletePart(index)
+                      }}
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6 text-muted-foreground hover:text-destructive"
+                      disabled={contentParts.length === 1}
+                    >
+                      <CircleX className="h-4 w-4" />
+                    </Button>
                   </div>
-                  <Button
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      handleDeletePart(index)
-                    }}
-                    variant="destructive"
-                    size="icon"
-                    disabled={contentParts.length === 1}
-                    className="opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer absolute top-0 right-0"
-                  >
-                    <CircleX size={15} />
-                  </Button>
-                </div>
-              </div>
+                  <div className="text-xs text-muted-foreground line-clamp-3 h-[4.5em] whitespace-normal break-words">
+                    {part.content || <span className="italic opacity-50">Empty part...</span>}
+                  </div>
+                </CardContent>
+              </Card>
             ))}
-            <div
+            
+            <Card
               onClick={handleAddPart}
-              className="flex justify-center border rounded-md flex-col items-center border-dashed w-40 cursor-pointer bg-muted"
+              className="w-48 shrink-0 cursor-pointer border-dashed hover:bg-accent/50 hover:border-primary/50 transition-all flex items-center justify-center"
             >
-              <Plus className="w-5 h-5 mr-2" />
-              Add
-            </div>
+              <CardContent className="flex flex-col items-center justify-center p-6 text-muted-foreground hover:text-primary transition-colors">
+                <Plus className="h-8 w-8 mb-2" />
+                <span className="text-sm font-medium">Add Part</span>
+              </CardContent>
+            </Card>
           </div>
           <ScrollBar orientation="horizontal" />
         </ScrollArea>
