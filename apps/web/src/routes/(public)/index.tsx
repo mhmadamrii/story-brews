@@ -79,7 +79,6 @@ function HomeComponent() {
 
   return (
     <div className="relative w-full min-h-screen overflow-x-hidden text-white">
-      {/* Background - Preserved */}
       <div className="fixed inset-0 z-0 pointer-events-none">
         <div className="absolute inset-0 bg-black" />
         <div
@@ -91,9 +90,7 @@ function HomeComponent() {
         />
       </div>
 
-      {/* Content */}
       <div className="relative z-10 flex flex-col min-h-screen">
-        {/* Navbar Placeholder */}
         <nav className="w-full px-8 py-6 flex justify-between items-center max-w-7xl mx-auto">
           <div className="text-2xl font-bold tracking-tighter">Story Brew</div>
           <div className="space-x-4">
@@ -112,7 +109,6 @@ function HomeComponent() {
           </div>
         </nav>
 
-        {/* Hero Section */}
         <main className="flex-grow flex flex-col items-center justify-center px-4 pt-20 pb-32 text-center max-w-5xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -138,7 +134,7 @@ function HomeComponent() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => navigate({ to: '/home' })}
-                className="px-8 py-4 bg-white text-black text-lg font-semibold rounded-full shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:shadow-[0_0_30px_rgba(255,255,255,0.5)] transition-all"
+                className="px-8 py-4 bg-white cursor-pointer text-black text-lg font-semibold rounded-full shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:shadow-[0_0_30px_rgba(255,255,255,0.5)] transition-all"
               >
                 Start Writing Now
               </motion.button>
@@ -153,7 +149,6 @@ function HomeComponent() {
           </motion.div>
         </main>
 
-        {/* Features Section */}
         <section className="w-full px-4 py-24 border-t border-white/5 bg-black/20 backdrop-blur-sm">
           <div className="max-w-7xl mx-auto">
             <motion.div
@@ -192,8 +187,6 @@ function HomeComponent() {
             </div>
           </div>
         </section>
-
-        {/* Footer */}
         <footer className="w-full py-8 text-center text-gray-600 text-sm border-t border-white/5">
           <p>© {new Date().getFullYear()} Story Brew. All rights reserved.</p>
         </footer>

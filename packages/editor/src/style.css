@@ -9,13 +9,12 @@
   /* background-color: transparent !important; */
 }
 
-.reactjs-tiptap-editor {
+.editor-wrapper .reactjs-tiptap-editor {
   height: 100% !important;
 }
 
 .editor-wrapper .richtext-max-h-full {
   padding: 5px !important;
-  /* border: 1px solid red !important; */
   background: transparent !important;
   min-height: 350px !important;
 }
