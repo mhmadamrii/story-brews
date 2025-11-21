@@ -2,6 +2,7 @@
 
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { EditorClient } from '@story-brew/editor/editor'
+import { Upload } from '@/components/claudinary/upload'
 
 export const Route = createFileRoute('/(play)/play/')({
   component: RouteComponent,
@@ -13,7 +14,7 @@ function RouteComponent() {
       <h1>This is PLAY SCREEN</h1>
       <Link to="/again">Again</Link>
       <div className="w-full">
-        <EditorClient initialContent="# This is a test" />
+        <Upload />
       </div>
     </div>
   )

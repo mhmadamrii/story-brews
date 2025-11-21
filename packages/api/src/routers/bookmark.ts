@@ -2,11 +2,21 @@ import z from 'zod'
 
 import { and, db, eq } from '@story-brew/db'
 import { protectedProcedure } from '..'
-import { bookmark } from '@story-brew/db/schema/story'
+import { bookmark, stories } from '@story-brew/db/schema/story'
+import { user } from '@story-brew/db/schema/auth'
 
 export const bookmarkRouter = {
   getAllBookmarks: protectedProcedure.query(({ ctx }) => {
-    return db.select().from(bookmark).where(eq(bookmark.userId, ctx.session.user.id))
+    return db
+      .select({
+        bookmark: bookmark,
+        story: stories,
+        user: user,
+      })
+      .from(bookmark)
+      .innerJoin(stories, eq(stories.id, bookmark.storyId))
+      .innerJoin(user, eq(user.id, stories.userId))
+      .where(eq(bookmark.userId, ctx.session.user.id))
   }),
   addBookmark: protectedProcedure
     .input(

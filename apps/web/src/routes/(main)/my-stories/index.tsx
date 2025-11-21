@@ -15,7 +15,7 @@ function RouteComponent() {
   console.log('mystories', myStories)
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 p-4">
       {myStories
         ?.map((item) => ({
           id: item.id,

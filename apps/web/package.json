@@ -10,6 +10,8 @@
     "cf-typegen": "wrangler types --env-interface Env"
   },
   "dependencies": {
+    "@cloudinary/react": "^1.14.3",
+    "@cloudinary/url-gen": "^1.22.0",
     "@story-brew/ai": "workspace:*",
     "@story-brew/api": "workspace:*",
     "@story-brew/auth": "workspace:*",
