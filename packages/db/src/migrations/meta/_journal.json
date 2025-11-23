@@ -15,6 +15,13 @@
       "when": 1762479603139,
       "tag": "0001_peaceful_komodo",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1763728920651,
+      "tag": "0002_bouncy_zeigeist",
+      "breakpoints": true
     }
   ]
 }

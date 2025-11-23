@@ -110,6 +110,7 @@ export const storyRouter = {
       z.object({
         title: z.string(),
         synopsis: z.string(),
+        coverImage: z.string().nullable(),
         contentParts: z.array(
           z.object({
             id: z.string(),
@@ -127,6 +128,7 @@ export const storyRouter = {
             synopsis: input.synopsis,
             userId: ctx.session.user.id,
             title: input.title,
+            image: input.coverImage,
           })
           .returning({ id: stories.id })
 

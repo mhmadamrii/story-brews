@@ -1,28 +1,28 @@
-import { Button } from '@story-brew/ui/components/ui/button'
-import { Cloudinary } from '@cloudinary/url-gen'
-import { Input } from '@story-brew/ui/components/ui/input'
-import { useState } from 'react'
+import { toast } from 'sonner'
 
-export function Upload() {
-  const [file, setFile] = useState(null)
+export async function uploadToCloudinary(file: Blob | File) {
+  const cloudName = 'drrizo231' // Fallback to demo if not set
+  const uploadPreset = 'story-brew' // Fallback
 
-  const cld = new Cloudinary({
-    cloud: {
-      cloudName: 'demo',
-    },
-  })
+  const formData = new FormData()
+  formData.append('file', file)
+  formData.append('upload_preset', uploadPreset)
 
-  let soem = 'BCo__Thk35zEtZA_yKx998M5brA'
+  try {
+    const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+      method: 'POST',
+      body: formData,
+    })
 
-  console.log('file', file)
+    if (!response.ok) {
+      throw new Error('Failed to upload image')
+    }
 
-  const handleUpload = () => {
-    const form = new FormData()
+    const data = await response.json()
+    return data.secure_url as string
+  } catch (error) {
+    console.error('Cloudinary upload error:', error)
+    toast.error('Failed to upload image to Cloudinary')
+    throw error
   }
-
-  return (
-    <div>
-      <Input onChange={(e) => setFile(e.target.files[0])} type="file" />
-    </div>
-  )
 }

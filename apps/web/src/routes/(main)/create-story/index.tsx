@@ -11,14 +11,17 @@ import { Button } from '@story-brew/ui/components/ui/button'
 import { Input } from '@story-brew/ui/components/ui/input'
 import { Textarea } from '@story-brew/ui/components/ui/textarea'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { CircleX, PencilLine, Plus, Trash, Trash2, Loader2 } from 'lucide-react'
-import { useCallback, useEffect, useState } from 'react'
+import { PencilLine, Plus, Trash, Trash2, Loader2, Upload } from 'lucide-react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { generateStoryWithGemini, generateSynopsisWithGemini } from '@story-brew/ai/gemini-story'
 import { Label } from '@story-brew/ui/components/ui/label'
 import { ScrollArea } from '@story-brew/ui/components/ui/scroll-area'
 import { STORY_CATEGORY } from '@/lib/constants'
 import { useHeader } from '@/lib/header-context'
 import { ReadinessIndicator } from './-components/readiness-indicator'
+import { generateImageWithGemini } from '@story-brew/ai/gemini-image'
+import { uploadToCloudinary } from '@/components/claudinary/upload'
+import { Image as ImageIcon, RefreshCw } from 'lucide-react'
 
 import {
   Select,
@@ -58,6 +61,10 @@ function RouteComponent() {
   const [synopsis, setSynopsis] = useState('')
   const [selectedCategory, setSelectedCategory] = useState(0)
   const [lang, setLang] = useState<'en' | 'id'>('en')
+  const [coverImage, setCoverImage] = useState<string | null>(null)
+  const [isGeneratingCover, setIsGeneratingCover] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const [isOpen, setIsOpen] = useState(false)
   const [currentPartIndex, setCurrentPartIndex] = useState(0)
   const [isCreativeMode, setIsCreativeMode] = useState(false)
@@ -148,6 +155,64 @@ function RouteComponent() {
     }
   }
 
+  const handleGenerateCover = async () => {
+    if (!synopsis) {
+      toast.error('Please generate or write a synopsis first')
+      return
+    }
+
+    setIsGeneratingCover(true)
+    try {
+      const base64Image = await generateImageWithGemini(synopsis)
+
+      // Convert base64 to blob
+      const res = await fetch(`data:image/jpeg;base64,${base64Image}`)
+      const blob = await res.blob()
+      const file = new File([blob], 'cover.jpg', { type: 'image/jpeg' })
+
+      const url = await uploadToCloudinary(file)
+      setCoverImage(url)
+      toast.success('Cover image generated and uploaded!')
+    } catch (error: any) {
+      console.error(error)
+      toast.error(`Failed to generate cover: ${error?.message || 'Unknown error'}`)
+    } finally {
+      setIsGeneratingCover(false)
+    }
+  }
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please upload an image file')
+      return
+    }
+
+    setIsUploading(true)
+    try {
+      const url = await uploadToCloudinary(file)
+      setCoverImage(url)
+      toast.success('Cover image uploaded successfully!')
+    } catch (error: any) {
+      console.error(error)
+      toast.error(`Failed to upload cover: ${error?.message || 'Unknown error'}`)
+    } finally {
+      setIsUploading(false)
+      // Reset input so the same file can be selected again if needed
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
+    }
+  }
+
+  console.log('coverImage', coverImage)
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click()
+  }
+
   const handleContentChange = (newContent: string) => {
     const updatedParts = [...contentParts]
     updatedParts[currentPartIndex].content = newContent
@@ -159,6 +224,7 @@ function RouteComponent() {
       title,
       synopsis,
       contentParts,
+      coverImage,
     })
   }, [contentParts, createStory, synopsis, title])
 
@@ -192,7 +258,6 @@ function RouteComponent() {
     <section className="w-full px-4 py-6">
       {!isCreativeMode && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          {/* Left Sidebar - Configuration */}
           <div className="lg:col-span-4 space-y-6">
             <ReadinessIndicator
               checks={[
@@ -206,6 +271,7 @@ function RouteComponent() {
                 { label: 'Custom Context (Optional)', isValid: true }, // Optional
                 { label: 'Story Title', isValid: title.length > 0 },
                 { label: 'Story Synopsis', isValid: synopsis.length > 0 },
+                { label: 'Cover Image', isValid: !!coverImage },
                 {
                   label: 'Generated Content',
                   isValid: contentParts[currentPartIndex].content.length > 0,
@@ -340,8 +406,6 @@ function RouteComponent() {
               </CardContent>
             </Card>
           </div>
-
-          {/* Right Panel - Editor */}
           <div className="lg:col-span-8 space-y-6">
             <Card className="h-full">
               <CardHeader>
@@ -389,6 +453,70 @@ function RouteComponent() {
                       className="min-h-[100px]"
                     />
                   </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Label>Cover Image</Label>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 text-xs gap-1"
+                      onClick={handleGenerateCover}
+                      disabled={!synopsis || isGeneratingCover}
+                    >
+                      {isGeneratingCover ? (
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                      ) : (
+                        <RefreshCw className="h-3 w-3" />
+                      )}
+                      Generate Cover
+                    </Button>
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      className="hidden"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                    />
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-6 text-xs gap-1"
+                      onClick={handleUploadClick}
+                      disabled={isUploading || isGeneratingCover}
+                    >
+                      {isUploading ? (
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                      ) : (
+                        <Upload className="h-3 w-3" />
+                      )}
+                      Upload
+                    </Button>
+                  </div>
+
+                  {coverImage ? (
+                    <div className="relative aspect-video w-full overflow-hidden rounded-md border bg-muted">
+                      <img
+                        src={coverImage}
+                        alt="Story cover"
+                        className="h-full w-full object-cover"
+                      />
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        className="absolute right-2 top-2 h-8 w-8"
+                        onClick={() => setCoverImage(null)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex aspect-video w-full flex-col items-center justify-center rounded-md border border-dashed bg-muted/50 text-muted-foreground">
+                      <ImageIcon className="mb-2 h-8 w-8 opacity-50" />
+                      <p className="text-xs">No cover image generated</p>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>

@@ -36,6 +36,7 @@ type StoryData = {
   author: string
   synopsis: string
   isBookmarked: boolean
+  image: string | null
 }
 
 function RouteComponent() {
@@ -46,6 +47,7 @@ function RouteComponent() {
   const [stories, setStories] = useState<Array<StoryData>>()
   const [likedStories, setLikedStories] = useState(new Set())
   const [savedStories, setSavedStories] = useState(new Set())
+  console.log('stories', stories)
 
   const { setTitle } = useHeader()
   const { data: storiesData } = useQuery(trpc.storyRouter.getAllStories.queryOptions())
@@ -124,6 +126,7 @@ function RouteComponent() {
           likes: s.stories.likes ?? 0,
           author: s.user.name,
           // content: s.story_part.content,
+          image: s.stories.image,
           synopsis: s.stories.synopsis,
           isBookmarked: s.bookmark?.id ? true : false,
         }))
@@ -162,9 +165,16 @@ function RouteComponent() {
                   show: { opacity: 1, y: 0 },
                 }}
               >
-                <Card className="flex flex-col h-full">
+                <Card className="flex flex-col h-full pt-0 overflow-hidden group">
+                  <div className="aspect-video w-full overflow-hidden bg-muted">
+                    <img
+                      src={item.image || '/placeholder-cover-image.png'}
+                      alt={item.title}
+                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                  </div>
                   <CardHeader>
-                    <CardTitle className="text-xl font-bold">{item.title}</CardTitle>
+                    <CardTitle className="text-xl font-bold line-clamp-1">{item.title}</CardTitle>
                     <CardDescription className="flex items-center gap-2 text-sm">
                       <User className="w-4 h-4" />
                       <span>{item.author}</span>
