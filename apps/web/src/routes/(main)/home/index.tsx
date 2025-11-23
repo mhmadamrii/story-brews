@@ -1,6 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
-import { useHeader } from '@/lib/header-context'
 import { useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -24,6 +23,9 @@ import {
 export const Route = createFileRoute('/(main)/home/')({
   component: RouteComponent,
   validateSearch: authorSearchSchema,
+  staticData: {
+    title: 'Every line was once a thought. Every thought, a story.',
+  },
 })
 
 type StoryData = {
@@ -49,7 +51,6 @@ function RouteComponent() {
   const [savedStories, setSavedStories] = useState(new Set())
   console.log('stories', stories)
 
-  const { setTitle } = useHeader()
   const { data: storiesData } = useQuery(trpc.storyRouter.getAllStories.queryOptions())
 
   const { mutate: bookmarkStory } = useMutation(
@@ -118,7 +119,6 @@ function RouteComponent() {
   }
 
   useEffect(() => {
-    setTitle('Every line was once a thought. Every thought, a story.')
     if (storiesData) {
       setStories(
         storiesData.map((s) => ({

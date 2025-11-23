@@ -4,21 +4,16 @@ import { useQuery } from '@tanstack/react-query'
 import { motion } from 'motion/react'
 import { BookmarkCard } from './-components/bookmark-card'
 import { Loader2, BookmarkX } from 'lucide-react'
-import { useHeader } from '@/lib/header-context'
-import { useEffect } from 'react'
 
 export const Route = createFileRoute('/(main)/bookmark/')({
   component: RouteComponent,
+  staticData: {
+    title: 'Bookmarks',
+  },
 })
 
 function RouteComponent() {
   const trpc = useTRPC()
-  const { setTitle } = useHeader()
-
-  useEffect(() => {
-    setTitle('My Bookmarks')
-    return () => setTitle('Story Brew')
-  }, [setTitle])
 
   const { data: bookmarks, isLoading } = useQuery(
     trpc.bookmarkRouter.getAllBookmarks.queryOptions()

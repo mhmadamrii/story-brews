@@ -12,16 +12,17 @@ import { Input } from '@story-brew/ui/components/ui/input'
 import { Textarea } from '@story-brew/ui/components/ui/textarea'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { PencilLine, Plus, Trash, Trash2, Loader2, Upload } from 'lucide-react'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { generateStoryWithGemini, generateSynopsisWithGemini } from '@story-brew/ai/gemini-story'
 import { Label } from '@story-brew/ui/components/ui/label'
 import { ScrollArea } from '@story-brew/ui/components/ui/scroll-area'
 import { STORY_CATEGORY } from '@/lib/constants'
-import { useHeader } from '@/lib/header-context'
+// import { STORY_CATEGORY } from '@/lib/constants'
 import { ReadinessIndicator } from './-components/readiness-indicator'
 import { generateImageWithGemini } from '@story-brew/ai/gemini-image'
 import { uploadToCloudinary } from '@/components/claudinary/upload'
 import { Image as ImageIcon, RefreshCw } from 'lucide-react'
+import { HeaderAction } from '@/components/header-portal'
 
 import {
   Select,
@@ -47,14 +48,16 @@ export type ContentPart = Array<{
 
 export const Route = createFileRoute('/(main)/create-story/')({
   component: RouteComponent,
+  staticData: {
+    title: 'Story Editor',
+  },
 })
 
 function RouteComponent() {
   const queryClient = useQueryClient()
+
   const trpc = useTRPC()
   const navigate = useNavigate()
-
-  const { setHeaderAction, setTitle } = useHeader()
 
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [title, setTitleState] = useState('')
@@ -232,28 +235,18 @@ function RouteComponent() {
     synopsis.length > 0 &&
     contentParts[currentPartIndex].content.length > 0
 
-  useEffect(() => {
-    setTitle('Story Editor')
-    console.log('effect......')
-    setHeaderAction(
-      <Button
-        className="cursor-pointer flex items-center gap-2"
-        onClick={handleCreateStory}
-        disabled={!isPublishable}
-      >
-        <PencilLine />
-        Publish
-      </Button>
-    )
-
-    return () => {
-      setHeaderAction(null)
-      setTitle('Story Brew')
-    }
-  }, [handleCreateStory, isPublishable, setHeaderAction, setTitle])
-
   return (
     <section className="w-full px-4 py-6">
+      <HeaderAction>
+        <Button
+          className="cursor-pointer flex items-center gap-2"
+          onClick={handleCreateStory}
+          disabled={!isPublishable}
+        >
+          <PencilLine />
+          Publish
+        </Button>
+      </HeaderAction>
       {!isCreativeMode && (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           <div className="lg:col-span-4 space-y-6">
