@@ -56,6 +56,7 @@ function RouteComponent() {
 
   const { setHeaderAction, setTitle } = useHeader()
 
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const [title, setTitleState] = useState('')
   const [customPrompt, setCustomPrompt] = useState('')
   const [synopsis, setSynopsis] = useState('')
@@ -64,10 +65,10 @@ function RouteComponent() {
   const [coverImage, setCoverImage] = useState<string | null>(null)
   const [isGeneratingCover, setIsGeneratingCover] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement>(null)
   const [isOpen, setIsOpen] = useState(false)
   const [currentPartIndex, setCurrentPartIndex] = useState(0)
   const [isCreativeMode, setIsCreativeMode] = useState(false)
+  const [isGenerating, setIsGenerating] = useState(false)
   const [contentParts, setContentParts] = useState<ContentPart>([
     {
       id: Date.now().toString(),
@@ -104,8 +105,6 @@ function RouteComponent() {
       },
     })
   )
-
-  const [isGenerating, setIsGenerating] = useState(false)
 
   const handleGenerate = async () => {
     setIsGenerating(true)
@@ -207,8 +206,6 @@ function RouteComponent() {
     }
   }
 
-  console.log('coverImage', coverImage)
-
   const handleUploadClick = () => {
     fileInputRef.current?.click()
   }
@@ -237,6 +234,7 @@ function RouteComponent() {
 
   useEffect(() => {
     setTitle('Story Editor')
+    console.log('effect......')
     setHeaderAction(
       <Button
         className="cursor-pointer flex items-center gap-2"
@@ -261,24 +259,42 @@ function RouteComponent() {
           <div className="lg:col-span-4 space-y-6">
             <ReadinessIndicator
               checks={[
-                { label: 'Select Category', isValid: selectedCategory !== 0 },
+                {
+                  label: 'Select Category',
+                  isValid: selectedCategory !== 0,
+                },
                 {
                   label: 'Add Story Blocks',
                   isValid: (storyBlocks?.length || 0) > 0,
                   onClick: () => setIsOpen(true),
                 },
-                { label: 'Select Language', isValid: true, onClick: () => setLang('en') }, // Default is en
-                { label: 'Custom Context (Optional)', isValid: true }, // Optional
-                { label: 'Story Title', isValid: title.length > 0 },
-                { label: 'Story Synopsis', isValid: synopsis.length > 0 },
-                { label: 'Cover Image', isValid: !!coverImage },
+                {
+                  label: 'Select Language',
+                  isValid: true,
+                  onClick: () => setLang('en'),
+                },
+                {
+                  label: 'Custom Context (Optional)',
+                  isValid: true,
+                },
+                {
+                  label: 'Story Title',
+                  isValid: title.length > 0,
+                },
+                {
+                  label: 'Story Synopsis',
+                  isValid: synopsis.length > 0,
+                },
+                {
+                  label: 'Cover Image',
+                  isValid: !!coverImage,
+                },
                 {
                   label: 'Generated Content',
                   isValid: contentParts[currentPartIndex].content.length > 0,
                 },
               ]}
             />
-
             <Card>
               <CardHeader>
                 <CardTitle>Story Configuration</CardTitle>
@@ -306,7 +322,6 @@ function RouteComponent() {
                   </div>
                 </div>
 
-                {/* Story Blocks */}
                 <div className="space-y-3">
                   <div className="flex justify-between items-center">
                     <Label>Story Blocks</Label>
@@ -362,8 +377,6 @@ function RouteComponent() {
                     </div>
                   </ScrollArea>
                 </div>
-
-                {/* Language & Context */}
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <Label>Language</Label>
