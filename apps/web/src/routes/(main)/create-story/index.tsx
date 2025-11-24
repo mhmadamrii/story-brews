@@ -17,7 +17,6 @@ import { generateStoryWithGemini, generateSynopsisWithGemini } from '@story-brew
 import { Label } from '@story-brew/ui/components/ui/label'
 import { ScrollArea } from '@story-brew/ui/components/ui/scroll-area'
 import { STORY_CATEGORY } from '@/lib/constants'
-// import { STORY_CATEGORY } from '@/lib/constants'
 import { ReadinessIndicator } from './-components/readiness-indicator'
 import { generateImageWithGemini } from '@story-brew/ai/gemini-image'
 import { uploadToCloudinary } from '@/components/claudinary/upload'
@@ -248,8 +247,8 @@ function RouteComponent() {
         </Button>
       </HeaderAction>
       {!isCreativeMode && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          <div className="lg:col-span-4 space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 relative">
+          <div id="left-section" className="lg:col-span-4 space-y-6 sticky">
             <ReadinessIndicator
               checks={[
                 {
@@ -294,7 +293,6 @@ function RouteComponent() {
                 <CardDescription>Setup your story parameters</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
-                {/* Category Selection */}
                 <div className="space-y-3">
                   <Label>Category</Label>
                   <div className="grid grid-cols-2 gap-2">
@@ -422,7 +420,7 @@ function RouteComponent() {
                 <div className="space-y-2">
                   <Label className="text-lg font-semibold">Story Title</Label>
                   <Input
-                    className="text-lg font-medium h-12"
+                    className="text-lg font-medium h-10"
                     placeholder="Enter your story title..."
                     value={title}
                     onChange={(e) => setTitleState(e.target.value)}
