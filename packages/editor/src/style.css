@@ -21,9 +21,21 @@
 
 .editor-wrapper .tiptap.ProseMirror {
   padding: 5px !important;
+  border: none !important;
+}
+
+.editor-wrapper .richtext-overflow-hidden {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
 }
 
 .editor-wrapper .richtext-relative {
   min-height: 300px !important;
   /* border: 1px solid red; */
+}
+
+.richtext-flex.richtext-justify-end.richtext-gap-3.richtext-text-sm span {
+  display: none;
 }

@@ -65,14 +65,21 @@ function RouteComponent() {
         </div>
         <Card className="shadow-lg">
           <CardHeader className="space-y-4">
-            <div className="flex items-start justify-between">
-              <div className="space-y-2 flex-1">
-                <CardTitle className="text-3xl font-bold leading-tight">{story?.title}</CardTitle>
+            <div className="flex flex-col gap-4">
+              {story?.image && (
+                <div className="w-full aspect-video relative rounded-lg overflow-hidden">
+                  <img src={story.image} alt={story.title} className="w-full h-full object-cover" />
+                </div>
+              )}
+              <div className="flex items-start justify-between">
+                <div className="space-y-2 flex-1">
+                  <CardTitle className="text-3xl font-bold leading-tight">{story?.title}</CardTitle>
+                </div>
+                <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
+                  <BookOpen className="w-3 h-3 mr-1" />
+                  {story?.parts.length} Bagian
+                </Badge>
               </div>
-              <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
-                <BookOpen className="w-3 h-3 mr-1" />
-                {story?.parts.length} Bagian
-              </Badge>
             </div>
             <Separator />
             <p className="italic">{story?.synopsis}</p>

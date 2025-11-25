@@ -225,7 +225,7 @@ function RouteComponent() {
       contentParts,
       coverImage,
     })
-  }, [contentParts, createStory, synopsis, title])
+  }, [contentParts, createStory, synopsis, title, coverImage])
 
   const isPublishable =
     selectedCategory !== 0 &&
