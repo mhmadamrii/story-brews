@@ -19,7 +19,6 @@ import 'reactjs-tiptap-editor/style.css'
 import '../style.css'
 
 export function ReadOnlyEditor({ initialValue }: { initialValue: string }) {
-  console.log('initialValue readonly', initialValue)
   const [initialEditorContent, setInitialEditorContent] = useState(initialValue)
 
   const extensions = [

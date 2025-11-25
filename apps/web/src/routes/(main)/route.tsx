@@ -1,4 +1,10 @@
 import { getUser } from '@/functions/get-user'
+import { Loader } from 'lucide-react'
+import { SidebarProvider } from '@story-brew/ui/components/ui/sidebar'
+import { AppSidebar } from '@/components/app-sidebar'
+import { ScrollArea } from '@story-brew/ui/components/ui/scroll-area'
+import { HeaderLayout } from '@/components/header-layout'
+
 import {
   createFileRoute,
   Outlet,
@@ -6,11 +12,6 @@ import {
   useMatches,
   useRouterState,
 } from '@tanstack/react-router'
-import { Loader } from 'lucide-react'
-import { SidebarProvider } from '@story-brew/ui/components/ui/sidebar'
-import { AppSidebar } from '@/components/app-sidebar'
-import { ScrollArea } from '@story-brew/ui/components/ui/scroll-area'
-import { HeaderLayout } from '@/components/header-layout'
 
 export const Route = createFileRoute('/(main)')({
   component: RouteComponent,

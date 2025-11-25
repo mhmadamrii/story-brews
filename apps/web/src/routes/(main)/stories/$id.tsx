@@ -1,9 +1,8 @@
 import { useTRPC } from '@/utils/trpc'
 import { Avatar, AvatarFallback, AvatarImage } from '@story-brew/ui/components/ui/avatar'
-import { Card, CardContent, CardHeader, CardTitle } from '@story-brew/ui/components/ui/card'
 import { useQuery } from '@tanstack/react-query'
+import { CreativeMode } from '../create-story/-components/creative-mode'
 import { createFileRoute } from '@tanstack/react-router'
-import { BookOpen, Calendar, ScrollText, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Badge } from '@story-brew/ui/components/ui/badge'
 import { formatDate } from '@story-brew/ui/lib/utils'
 import { Separator } from '@story-brew/ui/components/ui/separator'
@@ -13,21 +12,49 @@ import { Tabs, TabsList, TabsTrigger } from '@story-brew/ui/components/ui/tabs'
 import { Button } from '@story-brew/ui/components/ui/button'
 import { motion, AnimatePresence } from 'motion/react'
 
+import {
+  BookOpen,
+  Calendar,
+  ScrollText,
+  ChevronLeft,
+  ChevronRight,
+  Pencil,
+  Copy,
+  Trash,
+} from 'lucide-react'
+
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@story-brew/ui/components/ui/card'
+
 export const Route = createFileRoute('/(main)/stories/$id')({
   component: RouteComponent,
+  loader: async ({ context }) => {
+    const session = context.session
+    return { session }
+  },
 })
 
 function RouteComponent() {
   const trpc = useTRPC()
+  const { session } = Route.useLoaderData()
   const { id } = Route.useParams()
+
   const [layoutMode, setLayoutMode] = useState<'scroll' | 'paginate'>('scroll')
   const [currentPartIndex, setCurrentPartIndex] = useState(0)
+  const [isEditing, setIsEditing] = useState(false)
 
   const { data: story } = useQuery(
     trpc.storyRouter.getStoryById.queryOptions({
       id,
     })
   )
+
+  console.log('story', story?.user.id === session?.user.id)
 
   const handleNextPart = () => {
     if (story?.parts && currentPartIndex < story.parts.length - 1) {
@@ -85,7 +112,6 @@ function RouteComponent() {
             <p className="italic">{story?.synopsis}</p>
           </CardHeader>
         </Card>
-
         <div className="flex justify-end">
           <Tabs value={layoutMode} onValueChange={(v) => setLayoutMode(v as 'scroll' | 'paginate')}>
             <TabsList>
@@ -100,7 +126,6 @@ function RouteComponent() {
             </TabsList>
           </Tabs>
         </div>
-
         <div>
           {layoutMode === 'scroll' ? (
             <div className="space-y-4">
@@ -109,9 +134,40 @@ function RouteComponent() {
                   <CardHeader>
                     <CardTitle>Part {index + 1}</CardTitle>
                   </CardHeader>
-                  <CardContent>
-                    <ReadOnlyEditor initialValue={part?.content ?? ''} />
-                  </CardContent>
+                  {isEditing ? (
+                    <CreativeMode
+                      initialValue={part?.content ?? ''}
+                      onChange={(value) => {
+                        console.log(value)
+                      }}
+                      onDeactivateCreativeMode={() => {
+                        setIsEditing(false)
+                      }}
+                    />
+                  ) : (
+                    <CardContent>
+                      <ReadOnlyEditor initialValue={part?.content ?? ''} />
+                    </CardContent>
+                  )}
+
+                  {story?.user.id === session?.user.id && (
+                    <CardFooter className="flex justify-end gap-2">
+                      <Button className="cursor-pointer" variant="secondary" size="icon">
+                        <Trash />
+                      </Button>
+                      <Button className="cursor-pointer" variant="ghost" size="icon">
+                        <Copy />
+                      </Button>
+                      <Button
+                        onClick={() => setIsEditing(true)}
+                        className="cursor-pointer"
+                        variant="ghost"
+                        size="icon"
+                      >
+                        <Pencil />
+                      </Button>
+                    </CardFooter>
+                  )}
                 </Card>
               ))}
             </div>
