@@ -1,6 +1,6 @@
 import { useTRPC } from '@/utils/trpc'
 import { Avatar, AvatarFallback, AvatarImage } from '@story-brew/ui/components/ui/avatar'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { CreativeMode } from '../create-story/-components/creative-mode'
 import { createFileRoute } from '@tanstack/react-router'
 import { Badge } from '@story-brew/ui/components/ui/badge'
@@ -46,7 +46,7 @@ function RouteComponent() {
 
   const [layoutMode, setLayoutMode] = useState<'scroll' | 'paginate'>('scroll')
   const [currentPartIndex, setCurrentPartIndex] = useState(0)
-  const [isEditing, setIsEditing] = useState(false)
+  const [editingPartId, setEditingPartId] = useState<string | null>(null)
 
   const { data: story } = useQuery(
     trpc.storyRouter.getStoryById.queryOptions({
@@ -70,6 +70,36 @@ function RouteComponent() {
     }
   }
 
+  const queryClient = useQueryClient()
+  const { mutate: updateStoryPart } = useMutation(
+    trpc.storyRouter.updateStoryPart.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries(trpc.storyRouter.getStoryById.queryOptions({ id }))
+        setEditingPartId(null)
+      },
+    })
+  )
+  const { mutate: deleteStoryPart } = useMutation(
+    trpc.storyRouter.deleteStoryPart.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries(trpc.storyRouter.getStoryById.queryOptions({ id }))
+      },
+    })
+  )
+  const { mutate: duplicateStoryPart } = useMutation(
+    trpc.storyRouter.duplicateStoryPart.mutationOptions({
+      onSuccess: () => {
+        queryClient.invalidateQueries(trpc.storyRouter.getStoryById.queryOptions({ id }))
+      },
+    })
+  )
+
+  const [editingContent, setEditingContent] = useState('')
+
+  const handleSave = (partId: string) => {
+    updateStoryPart({ id: partId, content: editingContent })
+  }
+
   return (
     <div className="px-4 py-2">
       <div className="w-full flex flex-col gap-4">
@@ -83,7 +113,7 @@ function RouteComponent() {
               by <span className="font-bold">{story?.user?.name}</span>
             </p>
             <div className="flex items-center gap-1.5">
-              <Calendar className="w-3 h-3 text-muted-foreground" />
+              <Calendar className="w-3 h-3 mr-1 text-muted-foreground" />
               <span className="text-sm text-muted-foreground">
                 {formatDate(story?.createdAt ?? new Date().toString())}
               </span>
@@ -129,47 +159,74 @@ function RouteComponent() {
         <div>
           {layoutMode === 'scroll' ? (
             <div className="space-y-4">
-              {story?.parts.map((part, index) => (
-                <Card key={part?.id}>
-                  <CardHeader>
-                    <CardTitle>Part {index + 1}</CardTitle>
-                  </CardHeader>
-                  {isEditing ? (
-                    <CreativeMode
-                      initialValue={part?.content ?? ''}
-                      onChange={(value) => {
-                        console.log(value)
-                      }}
-                      onDeactivateCreativeMode={() => {
-                        setIsEditing(false)
-                      }}
-                    />
-                  ) : (
-                    <CardContent>
-                      <ReadOnlyEditor initialValue={part?.content ?? ''} />
-                    </CardContent>
-                  )}
+              {story?.parts.map((part, index) => {
+                if (!part) return null
+                return (
+                  <Card key={part.id}>
+                    <CardHeader>
+                      <CardTitle>Part {index + 1}</CardTitle>
+                    </CardHeader>
+                    {editingPartId === part.id ? (
+                      <div className="p-4 h-[500px]">
+                        <CreativeMode
+                          initialValue={part.content ?? ''}
+                          onChange={(value) => {
+                            setEditingContent(value)
+                          }}
+                          onDeactivateCreativeMode={() => {
+                            setEditingPartId(null)
+                          }}
+                          onSave={() => handleSave(part.id)}
+                        />
+                      </div>
+                    ) : (
+                      <CardContent>
+                        <ReadOnlyEditor initialValue={part.content ?? ''} />
+                      </CardContent>
+                    )}
 
-                  {story?.user.id === session?.user.id && (
-                    <CardFooter className="flex justify-end gap-2">
-                      <Button className="cursor-pointer" variant="secondary" size="icon">
-                        <Trash />
-                      </Button>
-                      <Button className="cursor-pointer" variant="ghost" size="icon">
-                        <Copy />
-                      </Button>
-                      <Button
-                        onClick={() => setIsEditing(true)}
-                        className="cursor-pointer"
-                        variant="ghost"
-                        size="icon"
-                      >
-                        <Pencil />
-                      </Button>
-                    </CardFooter>
-                  )}
-                </Card>
-              ))}
+                    {story?.user.id === session?.user.id && !editingPartId && (
+                      <CardFooter className="flex justify-end gap-2">
+                        <Button
+                          className="cursor-pointer"
+                          variant="secondary"
+                          size="icon"
+                          onClick={() => {
+                            if (confirm('Are you sure you want to delete this part?')) {
+                              deleteStoryPart({ id: part.id })
+                            }
+                          }}
+                        >
+                          <Trash />
+                        </Button>
+                        <Button
+                          className="cursor-pointer"
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => duplicateStoryPart({ id: part.id })}
+                        >
+                          <Copy />
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            setEditingPartId(part.id)
+                            setEditingContent(part.content)
+                          }}
+                          className="cursor-pointer"
+                          variant="ghost"
+                          size="icon"
+                          // onClick={() => {
+                          //   setEditingPartId(part.id)
+                          //   setEditingContent(part.content)
+                          // }}
+                        >
+                          <Pencil />
+                        </Button>
+                      </CardFooter>
+                    )}
+                  </Card>
+                )
+              })}
             </div>
           ) : (
             <div className="space-y-4">

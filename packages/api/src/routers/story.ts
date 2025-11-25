@@ -180,4 +180,47 @@ export const storyRouter = {
         return { liked: true }
       }
     }),
+  updateStoryPart: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        content: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      return db
+        .update(storyPart)
+        .set({ content: input.content, updatedAt: new Date() })
+        .where(eq(storyPart.id, input.id))
+        .returning()
+    }),
+  deleteStoryPart: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ input }) => {
+      return db.delete(storyPart).where(eq(storyPart.id, input.id)).returning()
+    }),
+  duplicateStoryPart: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ input }) => {
+      return db.transaction(async (tx) => {
+        const [part] = await tx.select().from(storyPart).where(eq(storyPart.id, input.id))
+        if (!part) throw new Error('Part not found')
+
+        await tx
+          .update(storyPart)
+          .set({ order: sql`${storyPart.order} + 1` })
+          .where(and(eq(storyPart.storyId, part.storyId), sql`${storyPart.order} > ${part.order}`))
+
+        const [newPart] = await tx
+          .insert(storyPart)
+          .values({
+            storyId: part.storyId,
+            content: part.content,
+            order: part.order + 1,
+          })
+          .returning()
+
+        return newPart
+      })
+    }),
 }
