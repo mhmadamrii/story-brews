@@ -49,27 +49,13 @@ function RouteComponent() {
   const [layoutMode, setLayoutMode] = useState<'scroll' | 'paginate'>('scroll')
   const [currentPartIndex, setCurrentPartIndex] = useState(0)
   const [editingPartId, setEditingPartId] = useState<string | null>(null)
+  const [editingContent, setEditingContent] = useState('')
 
   const { data: story } = useQuery(
     trpc.storyRouter.getStoryById.queryOptions({
       id,
     })
   )
-
-  const handleNextPart = () => {
-    if (story?.parts && currentPartIndex < story.parts.length - 1) {
-      setCurrentPartIndex((prev) => prev + 1)
-      window.scrollTo({ top: 0, behavior: 'smooth' })
-    }
-  }
-
-  const handlePrevPart = () => {
-    if (currentPartIndex > 0) {
-      setCurrentPartIndex((prev) => prev - 1)
-      window.scrollTo({ top: 0, behavior: 'smooth' })
-    }
-  }
-
   const { mutate: updateStoryPart } = useMutation(
     trpc.storyRouter.updateStoryPart.mutationOptions({
       onSuccess: () => {
@@ -93,56 +79,108 @@ function RouteComponent() {
     })
   )
 
-  const [editingContent, setEditingContent] = useState('')
-
   const handleSave = (partId: string) => {
     updateStoryPart({ id: partId, content: editingContent })
+  }
+
+  const handleNextPart = () => {
+    if (story?.parts && currentPartIndex < story.parts.length - 1) {
+      setCurrentPartIndex((prev) => prev + 1)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }
+
+  const handlePrevPart = () => {
+    if (currentPartIndex > 0) {
+      setCurrentPartIndex((prev) => prev - 1)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
   }
 
   return (
     <div className="px-4 py-2">
       <div className="w-full flex flex-col gap-4">
-        <div className="flex items-center gap-4 mb-8">
-          <Avatar>
-            <AvatarImage src={story?.user?.image || ''} />
-            <AvatarFallback>{story?.user?.name?.[0]}</AvatarFallback>
-          </Avatar>
-          <div>
-            <p className="text-muted-foreground">
-              by <span className="font-bold">{story?.user?.name}</span>
-            </p>
-            <div className="flex items-center gap-1.5">
-              <Calendar className="w-3 h-3 mr-1 text-muted-foreground" />
-              <span className="text-sm text-muted-foreground">
-                {formatDate(story?.createdAt ?? new Date().toString())}
-              </span>
-            </div>
-          </div>
-        </div>
-        <Card className="shadow-lg pt-0">
-          <CardHeader className="space-y-4 p-0">
-            <div className="flex flex-col gap-4">
-              {story?.image && (
-                <div className="w-full aspect-video relative rounded-lg overflow-hidden">
-                  <img src={story.image} alt={story.title} className="w-full h-full object-cover" />
-                </div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: 'easeOut' }}
+          className="relative overflow-hidden rounded-2xl shadow-2xl"
+        >
+          <Card className="border-0 overflow-hidden py-0">
+            <motion.div
+              className="relative w-full min-h-[500px] overflow-hidden"
+              initial={{ scale: 1.1 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 1.2, ease: 'easeOut' }}
+            >
+              {story?.image ? (
+                <>
+                  <img
+                    src={story.image}
+                    alt={story.title}
+                    className="w-full h-full object-cover opacity-40"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
+                </>
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-purple-900/90 via-blue-900/90 to-indigo-900/90" />
               )}
-            </div>
-            <div className="p-4 flex flex-col gap-5">
-              <div className="flex items-start justify-between">
-                <div className="space-y-2 flex-1">
-                  <CardTitle className="text-3xl font-bold leading-tight">{story?.title}</CardTitle>
-                </div>
-                <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
-                  <BookOpen className="w-3 h-3 mr-1" />
-                  {story?.parts.length} Bagian
-                </Badge>
+              <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-12">
+                <motion.div
+                  className="flex items-center gap-4 mb-6"
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                >
+                  <Avatar className="ring-4 ring-white/20 w-12 h-12">
+                    <AvatarImage src={story?.user?.image || ''} />
+                    <AvatarFallback className="text-white font-bold">
+                      {story?.user?.name?.[0]}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="text-white/90 text-sm">
+                      by <span className="font-bold text-white">{story?.user?.name}</span>
+                    </p>
+                    <div className="flex items-center gap-1.5">
+                      <Calendar className="w-3 h-3 text-white/70" />
+                      <span className="text-xs text-white/70">
+                        {formatDate(story?.createdAt ?? new Date().toString())}
+                      </span>
+                    </div>
+                  </div>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.3 }}
+                  className="flex items-start justify-between gap-4 mb-4"
+                >
+                  <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight flex-1 drop-shadow-lg">
+                    {story?.title}
+                  </h1>
+                  <Badge
+                    variant="outline"
+                    className="bg-white/20 backdrop-blur-sm text-white border-white/30 shadow-lg shrink-0"
+                  >
+                    <BookOpen className="w-3 h-3 mr-1" />
+                    {story?.parts.length} Bagian
+                  </Badge>
+                </motion.div>
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.4 }}
+                  className="w-full"
+                >
+                  <p className="text-muted-foreground text-lg leading-relaxed italic font-light">
+                    {story?.synopsis}
+                  </p>
+                </motion.div>
               </div>
-              <Separator />
-              <p className="italic">{story?.synopsis}</p>
-            </div>
-          </CardHeader>
-        </Card>
+            </motion.div>
+          </Card>
+        </motion.div>
         <div className="flex justify-end">
           <Tabs value={layoutMode} onValueChange={(v) => setLayoutMode(v as 'scroll' | 'paginate')}>
             <TabsList>
