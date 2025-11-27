@@ -41,6 +41,8 @@ export const Route = createFileRoute('/(main)/stories/$id')({
 
 function RouteComponent() {
   const trpc = useTRPC()
+  const queryClient = useQueryClient()
+
   const { session } = Route.useLoaderData()
   const { id } = Route.useParams()
 
@@ -53,8 +55,6 @@ function RouteComponent() {
       id,
     })
   )
-
-  console.log('story', story?.user.id === session?.user.id)
 
   const handleNextPart = () => {
     if (story?.parts && currentPartIndex < story.parts.length - 1) {
@@ -70,7 +70,6 @@ function RouteComponent() {
     }
   }
 
-  const queryClient = useQueryClient()
   const { mutate: updateStoryPart } = useMutation(
     trpc.storyRouter.updateStoryPart.mutationOptions({
       onSuccess: () => {
@@ -120,14 +119,16 @@ function RouteComponent() {
             </div>
           </div>
         </div>
-        <Card className="shadow-lg">
-          <CardHeader className="space-y-4">
+        <Card className="shadow-lg pt-0">
+          <CardHeader className="space-y-4 p-0">
             <div className="flex flex-col gap-4">
               {story?.image && (
                 <div className="w-full aspect-video relative rounded-lg overflow-hidden">
                   <img src={story.image} alt={story.title} className="w-full h-full object-cover" />
                 </div>
               )}
+            </div>
+            <div className="p-4 flex flex-col gap-5">
               <div className="flex items-start justify-between">
                 <div className="space-y-2 flex-1">
                   <CardTitle className="text-3xl font-bold leading-tight">{story?.title}</CardTitle>
@@ -137,9 +138,9 @@ function RouteComponent() {
                   {story?.parts.length} Bagian
                 </Badge>
               </div>
+              <Separator />
+              <p className="italic">{story?.synopsis}</p>
             </div>
-            <Separator />
-            <p className="italic">{story?.synopsis}</p>
           </CardHeader>
         </Card>
         <div className="flex justify-end">
@@ -167,7 +168,7 @@ function RouteComponent() {
                       <CardTitle>Part {index + 1}</CardTitle>
                     </CardHeader>
                     {editingPartId === part.id ? (
-                      <div className="p-4 h-[500px]">
+                      <div className="p-4 min-h-[500px]">
                         <CreativeMode
                           initialValue={part.content ?? ''}
                           onChange={(value) => {
@@ -184,7 +185,6 @@ function RouteComponent() {
                         <ReadOnlyEditor initialValue={part.content ?? ''} />
                       </CardContent>
                     )}
-
                     {story?.user.id === session?.user.id && !editingPartId && (
                       <CardFooter className="flex justify-end gap-2">
                         <Button
