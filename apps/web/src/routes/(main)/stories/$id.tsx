@@ -4,8 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { CreativeMode } from '../create-story/-components/creative-mode'
 import { createFileRoute } from '@tanstack/react-router'
 import { Badge } from '@story-brew/ui/components/ui/badge'
-import { formatDate } from '@story-brew/ui/lib/utils'
-import { Separator } from '@story-brew/ui/components/ui/separator'
+import { cn, formatDate } from '@story-brew/ui/lib/utils'
 import { ReadOnlyEditor } from '@story-brew/editor/read-only-editor'
 import { useState } from 'react'
 import { Tabs, TabsList, TabsTrigger } from '@story-brew/ui/components/ui/tabs'
@@ -22,6 +21,7 @@ import {
   Copy,
   Trash,
 } from 'lucide-react'
+import { AlertDeletePart } from './-components/alert-delete-part'
 
 import {
   Card,
@@ -197,74 +197,87 @@ function RouteComponent() {
         </div>
         <div>
           {layoutMode === 'scroll' ? (
-            <div className="space-y-4">
-              {story?.parts.map((part, index) => {
-                if (!part) return null
-                return (
-                  <Card key={part.id}>
-                    <CardHeader>
-                      <CardTitle>Part {index + 1}</CardTitle>
-                    </CardHeader>
-                    {editingPartId === part.id ? (
-                      <div className="p-4 min-h-[500px]">
-                        <CreativeMode
-                          initialValue={part.content ?? ''}
-                          onChange={(value) => {
-                            setEditingContent(value)
-                          }}
-                          onDeactivateCreativeMode={() => {
-                            setEditingPartId(null)
-                          }}
-                          onSave={() => handleSave(part.id)}
-                        />
-                      </div>
-                    ) : (
-                      <CardContent>
-                        <ReadOnlyEditor initialValue={part.content ?? ''} />
-                      </CardContent>
-                    )}
-                    {story?.user.id === session?.user.id && !editingPartId && (
-                      <CardFooter className="flex justify-end gap-2">
-                        <Button
-                          className="cursor-pointer"
-                          variant="secondary"
-                          size="icon"
-                          onClick={() => {
-                            if (confirm('Are you sure you want to delete this part?')) {
-                              deleteStoryPart({ id: part.id })
-                            }
-                          }}
-                        >
-                          <Trash />
-                        </Button>
-                        <Button
-                          className="cursor-pointer"
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => duplicateStoryPart({ id: part.id })}
-                        >
-                          <Copy />
-                        </Button>
-                        <Button
-                          onClick={() => {
-                            setEditingPartId(part.id)
-                            setEditingContent(part.content)
-                          }}
-                          className="cursor-pointer"
-                          variant="ghost"
-                          size="icon"
-                          // onClick={() => {
-                          //   setEditingPartId(part.id)
-                          //   setEditingContent(part.content)
-                          // }}
-                        >
-                          <Pencil />
-                        </Button>
-                      </CardFooter>
-                    )}
-                  </Card>
-                )
-              })}
+            <div className="space-y-4 flex gap-4 relative">
+              <div
+                className={cn('w-full sm:w-[70%]', {
+                  'sm:w-[100%]': editingPartId,
+                })}
+              >
+                {story?.parts.map((part) => {
+                  if (!part) return null
+                  return (
+                    <div
+                      id={`part-${part.id}`}
+                      className="flex w-full flex-col mb-5 group scroll-mt-20"
+                      key={part.id}
+                    >
+                      {editingPartId === part.id ? (
+                        <div className="min-h-[500px]">
+                          <CreativeMode
+                            initialValue={part.content ?? ''}
+                            onChange={(value) => {
+                              setEditingContent(value)
+                            }}
+                            onDeactivateCreativeMode={() => {
+                              setEditingPartId(null)
+                            }}
+                            onSave={() => handleSave(part.id)}
+                          />
+                        </div>
+                      ) : (
+                        <div>
+                          <ReadOnlyEditor initialValue={part.content ?? ''} />
+                        </div>
+                      )}
+                      {story?.user.id === session?.user.id && !editingPartId && (
+                        <div className="flex justify-end gap-5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                          <AlertDeletePart onConfirm={() => deleteStoryPart({ id: part.id })}>
+                            <button className="cursor-pointer">
+                              <Trash size={15} className="text-muted-foreground" />
+                            </button>
+                          </AlertDeletePart>
+                          <button
+                            className="cursor-pointer"
+                            onClick={() => duplicateStoryPart({ id: part.id })}
+                          >
+                            <Copy size={15} className="text-muted-foreground" />
+                          </button>
+                          <button
+                            className="cursor-pointer"
+                            onClick={() => {
+                              setEditingPartId(part.id)
+                              setEditingContent(part.content)
+                            }}
+                          >
+                            <Pencil size={15} className="text-muted-foreground" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+              <div className={cn('w-full sm:w-[30%] relative', { hidden: editingPartId })}>
+                <div className="sticky top-24 space-y-4">
+                  <h1 className="font-bold text-xl mb-4">Table of Contents</h1>
+                  <div className="flex flex-col gap-2 border-l-2 border-muted pl-4">
+                    {story?.parts.map((part, index) => (
+                      <button
+                        className="text-left text-sm text-muted-foreground hover:text-foreground transition-colors py-1 hover:translate-x-1 duration-200 cursor-pointer"
+                        key={part?.id}
+                        onClick={() => {
+                          document.getElementById(`part-${part?.id}`)?.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start',
+                          })
+                        }}
+                      >
+                        Part {index + 1}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
           ) : (
             <div className="space-y-4">
@@ -288,7 +301,6 @@ function RouteComponent() {
                   </motion.div>
                 )}
               </AnimatePresence>
-
               <div className="flex items-center justify-between pt-4">
                 <Button
                   variant="outline"
