@@ -1,4 +1,5 @@
 import { useTRPC } from '@/utils/trpc'
+import { Card, CardContent, CardHeader, CardTitle } from '@story-brew/ui/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@story-brew/ui/components/ui/avatar'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { CreativeMode } from '../create-story/-components/creative-mode'
@@ -22,14 +23,6 @@ import {
   Trash,
 } from 'lucide-react'
 import { AlertDeletePart } from './-components/alert-delete-part'
-
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@story-brew/ui/components/ui/card'
 
 export const Route = createFileRoute('/(main)/stories/$id')({
   component: RouteComponent,
@@ -98,7 +91,7 @@ function RouteComponent() {
   }
 
   return (
-    <div className="px-4 py-2">
+    <div className="px-4 py-2 font-['Merriweather']">
       <div className="w-full flex flex-col gap-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -173,7 +166,7 @@ function RouteComponent() {
                   transition={{ duration: 0.6, delay: 0.4 }}
                   className="w-full"
                 >
-                  <p className="text-muted-foreground text-lg leading-relaxed italic font-light">
+                  <p className="text-muted-foreground text-lg leading-relaxed italic font-light font-['Merriweather']">
                     {story?.synopsis}
                   </p>
                 </motion.div>
@@ -225,7 +218,7 @@ function RouteComponent() {
                           />
                         </div>
                       ) : (
-                        <div>
+                        <div className="font-['Times_New_Roman']">
                           <ReadOnlyEditor initialValue={part.content ?? ''} />
                         </div>
                       )}
@@ -294,7 +287,7 @@ function RouteComponent() {
                       <CardHeader>
                         <CardTitle>Part {currentPartIndex + 1}</CardTitle>
                       </CardHeader>
-                      <CardContent>
+                      <CardContent className="font-['Merriweather']">
                         <ReadOnlyEditor initialValue={story.parts[currentPartIndex].content} />
                       </CardContent>
                     </Card>
