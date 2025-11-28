@@ -1,0 +1,1 @@
+ALTER TABLE "stories" ADD COLUMN "category" varchar(255) DEFAULT 'Random';

@@ -15,7 +15,7 @@ import {
 export function AppSidebar() {
   const items = [
     {
-      title: 'Home / Explore',
+      title: 'Home & Explore',
       url: '/home',
       icon: Home,
     },
@@ -36,7 +36,7 @@ export function AppSidebar() {
     },
     {
       title: 'Analytics',
-      url: '/settings',
+      url: '/analytics',
       icon: ChartColumn,
     },
   ]

@@ -29,6 +29,13 @@
       "when": 1764300126766,
       "tag": "0003_supreme_amphibian",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1764329479194,
+      "tag": "0004_wooden_anthem",
+      "breakpoints": true
     }
   ]
 }

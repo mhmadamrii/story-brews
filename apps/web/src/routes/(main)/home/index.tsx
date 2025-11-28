@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { Badge } from '@story-brew/ui/components/ui/badge'
 import { toast } from 'sonner'
 import { useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
@@ -9,6 +10,7 @@ import { Button } from '@story-brew/ui/components/ui/button'
 import { Bookmark, Eye, Heart, User } from 'lucide-react'
 import { formatDate } from '@story-brew/ui/lib/utils'
 import { authorSearchSchema, StoryFilter } from './-components/story-filter'
+import { DialogSynopsis } from './-components/dialog-synopsis'
 import { motion } from 'motion/react'
 
 import {
@@ -39,6 +41,7 @@ type StoryData = {
   synopsis: string
   isBookmarked: boolean
   image: string | null
+  category: string | null
 }
 
 function RouteComponent() {
@@ -124,7 +127,7 @@ function RouteComponent() {
           ...s.stories,
           likes: s.stories.likes ?? 0,
           author: s.user.name,
-          // content: s.story_part.content,
+          category: s.stories.category,
           image: s.stories.image,
           synopsis: s.stories.synopsis,
           isBookmarked: s.bookmark?.id ? true : false,
@@ -136,7 +139,7 @@ function RouteComponent() {
 
   return (
     <div className="w-full px-4 pt-4">
-      <section className="flex flex-col gap-4">
+      <section className="flex flex-col gap-8">
         <PopularStories />
         <StoryFilter />
         {stories && (
@@ -164,7 +167,8 @@ function RouteComponent() {
                   show: { opacity: 1, y: 0 },
                 }}
               >
-                <Card className="flex flex-col h-full pt-0 overflow-hidden group">
+                <Card className="flex flex-col h-full pt-0 overflow-hidden group relative">
+                  <Badge className="absolute top-2 right-2">{item.category}</Badge>
                   <div className="aspect-video w-full overflow-hidden bg-muted">
                     <img
                       src={item.image || '/placeholder-cover-image.png'}
@@ -186,12 +190,11 @@ function RouteComponent() {
                       {truncateText(item.synopsis ?? '')}
                     </p>
                     {item?.synopsis!.length > 150 && (
-                      <button
-                        onClick={() => handleViewDetails(item.id)}
-                        className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm mt-2 font-medium cursor-pointer"
-                      >
-                        See details
-                      </button>
+                      <DialogSynopsis story={item}>
+                        <button className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm mt-2 font-medium cursor-pointer">
+                          See details
+                        </button>
+                      </DialogSynopsis>
                     )}
                   </CardContent>
                   <CardFooter className="flex items-center justify-between border-t pt-4 mt-auto">

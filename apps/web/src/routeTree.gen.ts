@@ -22,6 +22,7 @@ import { Route as mainMyStoriesIndexRouteImport } from './routes/(main)/my-stori
 import { Route as mainHomeIndexRouteImport } from './routes/(main)/home/index'
 import { Route as mainCreateStoryIndexRouteImport } from './routes/(main)/create-story/index'
 import { Route as mainBookmarkIndexRouteImport } from './routes/(main)/bookmark/index'
+import { Route as mainAnalyticsIndexRouteImport } from './routes/(main)/analytics/index'
 import { Route as mainStoriesIdRouteImport } from './routes/(main)/stories/$id'
 
 const mainRouteRoute = mainRouteRouteImport.update({
@@ -88,6 +89,11 @@ const mainBookmarkIndexRoute = mainBookmarkIndexRouteImport.update({
   path: '/bookmark/',
   getParentRoute: () => mainRouteRoute,
 } as any)
+const mainAnalyticsIndexRoute = mainAnalyticsIndexRouteImport.update({
+  id: '/analytics/',
+  path: '/analytics/',
+  getParentRoute: () => mainRouteRoute,
+} as any)
 const mainStoriesIdRoute = mainStoriesIdRouteImport.update({
   id: '/stories/$id',
   path: '/stories/$id',
@@ -97,6 +103,7 @@ const mainStoriesIdRoute = mainStoriesIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof publicIndexRoute
   '/stories/$id': typeof mainStoriesIdRoute
+  '/analytics': typeof mainAnalyticsIndexRoute
   '/bookmark': typeof mainBookmarkIndexRoute
   '/create-story': typeof mainCreateStoryIndexRoute
   '/home': typeof mainHomeIndexRoute
@@ -112,6 +119,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof publicIndexRoute
   '/stories/$id': typeof mainStoriesIdRoute
+  '/analytics': typeof mainAnalyticsIndexRoute
   '/bookmark': typeof mainBookmarkIndexRoute
   '/create-story': typeof mainCreateStoryIndexRoute
   '/home': typeof mainHomeIndexRoute
@@ -129,6 +137,7 @@ export interface FileRoutesById {
   '/(main)': typeof mainRouteRouteWithChildren
   '/(public)/': typeof publicIndexRoute
   '/(main)/stories/$id': typeof mainStoriesIdRoute
+  '/(main)/analytics/': typeof mainAnalyticsIndexRoute
   '/(main)/bookmark/': typeof mainBookmarkIndexRoute
   '/(main)/create-story/': typeof mainCreateStoryIndexRoute
   '/(main)/home/': typeof mainHomeIndexRoute
@@ -146,6 +155,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/stories/$id'
+    | '/analytics'
     | '/bookmark'
     | '/create-story'
     | '/home'
@@ -161,6 +171,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/stories/$id'
+    | '/analytics'
     | '/bookmark'
     | '/create-story'
     | '/home'
@@ -177,6 +188,7 @@ export interface FileRouteTypes {
     | '/(main)'
     | '/(public)/'
     | '/(main)/stories/$id'
+    | '/(main)/analytics/'
     | '/(main)/bookmark/'
     | '/(main)/create-story/'
     | '/(main)/home/'
@@ -293,6 +305,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof mainBookmarkIndexRouteImport
       parentRoute: typeof mainRouteRoute
     }
+    '/(main)/analytics/': {
+      id: '/(main)/analytics/'
+      path: '/analytics'
+      fullPath: '/analytics'
+      preLoaderRoute: typeof mainAnalyticsIndexRouteImport
+      parentRoute: typeof mainRouteRoute
+    }
     '/(main)/stories/$id': {
       id: '/(main)/stories/$id'
       path: '/stories/$id'
@@ -305,6 +324,7 @@ declare module '@tanstack/react-router' {
 
 interface mainRouteRouteChildren {
   mainStoriesIdRoute: typeof mainStoriesIdRoute
+  mainAnalyticsIndexRoute: typeof mainAnalyticsIndexRoute
   mainBookmarkIndexRoute: typeof mainBookmarkIndexRoute
   mainCreateStoryIndexRoute: typeof mainCreateStoryIndexRoute
   mainHomeIndexRoute: typeof mainHomeIndexRoute
@@ -315,6 +335,7 @@ interface mainRouteRouteChildren {
 
 const mainRouteRouteChildren: mainRouteRouteChildren = {
   mainStoriesIdRoute: mainStoriesIdRoute,
+  mainAnalyticsIndexRoute: mainAnalyticsIndexRoute,
   mainBookmarkIndexRoute: mainBookmarkIndexRoute,
   mainCreateStoryIndexRoute: mainCreateStoryIndexRoute,
   mainHomeIndexRoute: mainHomeIndexRoute,

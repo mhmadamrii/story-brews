@@ -224,8 +224,9 @@ function RouteComponent() {
       synopsis,
       contentParts,
       coverImage,
+      category: STORY_CATEGORY[selectedCategory - 1].name,
     })
-  }, [contentParts, createStory, synopsis, title, coverImage])
+  }, [contentParts, createStory, synopsis, title, coverImage, selectedCategory])
 
   const isPublishable =
     selectedCategory !== 0 &&

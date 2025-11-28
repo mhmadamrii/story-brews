@@ -50,6 +50,7 @@ export function StoryFilter() {
             <SelectValue placeholder="Author" />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="all">All</SelectItem>
             {authors?.map((author) => (
               <SelectItem key={author.id} value={author.id}>
                 {author.name}
@@ -62,6 +63,7 @@ export function StoryFilter() {
             <SelectValue placeholder="Category" />
           </SelectTrigger>
           <SelectContent>
+            <SelectItem value="all">All</SelectItem>
             {STORY_CATEGORY?.map((category) => (
               <SelectItem key={category.id} value={category.id.toString()}>
                 {category.name}
