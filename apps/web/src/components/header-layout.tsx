@@ -1,4 +1,4 @@
-import { SidebarTrigger } from '@story-brew/ui/components/ui/sidebar'
+import { SidebarTrigger } from '@story-brew/ui/components/animate-ui/components/radix/sidebar'
 
 export function HeaderLayout({ title }: { title: string }) {
   return (

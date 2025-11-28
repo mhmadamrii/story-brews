@@ -1,6 +1,6 @@
 import { getUser } from '@/functions/get-user'
 import { Loader } from 'lucide-react'
-import { SidebarProvider } from '@story-brew/ui/components/ui/sidebar'
+import { SidebarProvider } from '@story-brew/ui/components/animate-ui/components/radix/sidebar'
 import { AppSidebar } from '@/components/app-sidebar'
 import { ScrollArea } from '@story-brew/ui/components/ui/scroll-area'
 import { HeaderLayout } from '@/components/header-layout'
@@ -32,7 +32,6 @@ function MainLayout() {
   const isLoading = useRouterState({ select: (s) => s.isLoading })
   const matches = useMatches()
 
-  // Get the last match that has a title in staticData
   const title =
     (
       matches

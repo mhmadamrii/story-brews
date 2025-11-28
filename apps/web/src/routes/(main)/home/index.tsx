@@ -49,7 +49,6 @@ function RouteComponent() {
   const [stories, setStories] = useState<Array<StoryData>>()
   const [likedStories, setLikedStories] = useState(new Set())
   const [savedStories, setSavedStories] = useState(new Set())
-  console.log('stories', stories)
 
   const { data: storiesData } = useQuery(trpc.storyRouter.getAllStories.queryOptions())
 

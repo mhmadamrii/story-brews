@@ -10,7 +10,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from '@story-brew/ui/components/ui/sidebar'
+} from '@story-brew/ui/components/animate-ui/components/radix/sidebar'
 
 export function AppSidebar() {
   const items = [

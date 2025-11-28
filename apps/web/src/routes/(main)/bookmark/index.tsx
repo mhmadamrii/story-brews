@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { motion } from 'motion/react'
 import { BookmarkCard } from './-components/bookmark-card'
 import { Loader2, BookmarkX } from 'lucide-react'
+import { EmptyData } from '@/components/empty-data'
 
 export const Route = createFileRoute('/(main)/bookmark/')({
   component: RouteComponent,
@@ -39,21 +40,11 @@ function RouteComponent() {
 
   if (!bookmarks || bookmarks.length === 0) {
     return (
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="flex h-[60vh] flex-col items-center justify-center gap-4 text-center"
-      >
-        <div className="rounded-full bg-muted p-6">
-          <BookmarkX className="h-12 w-12 text-muted-foreground" />
-        </div>
-        <div className="space-y-2">
-          <h3 className="text-xl font-semibold">No bookmarks yet</h3>
-          <p className="text-muted-foreground max-w-sm">
-            Start exploring stories and bookmark your favorites to read them later.
-          </p>
-        </div>
-      </motion.div>
+      <EmptyData
+        title="No bookmarks yet"
+        description="Start exploring stories and bookmark your favorites to read them later."
+        icon={<BookmarkX className="h-12 w-12 text-muted-foreground" />}
+      />
     )
   }
 
