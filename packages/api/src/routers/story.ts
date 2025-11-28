@@ -7,7 +7,23 @@ import { user } from '@story-brew/db/schema/auth'
 
 export const storyRouter = {
   getAllMyStories: protectedProcedure.query(({ ctx }) => {
-    return db.select().from(stories).where(eq(stories.userId, ctx.session.user.id))
+    return db
+      .select({
+        id: stories.id,
+        userId: stories.userId,
+        title: stories.title,
+        likes: stories.likes,
+        synopsis: stories.synopsis,
+        image: stories.image,
+        impression: stories.impression,
+        createdAt: stories.createdAt,
+        updatedAt: stories.updatedAt,
+        partsCount: sql<number>`count(${storyPart.id})`.mapWith(Number),
+      })
+      .from(stories)
+      .leftJoin(storyPart, eq(storyPart.storyId, stories.id))
+      .where(eq(stories.userId, ctx.session.user.id))
+      .groupBy(stories.id)
   }),
   getPopularStories: protectedProcedure.query(() => {
     return db.select().from(stories)
@@ -205,6 +221,7 @@ export const storyRouter = {
       return db.transaction(async (tx) => {
         const [part] = await tx.select().from(storyPart).where(eq(storyPart.id, input.id))
         if (!part) throw new Error('Part not found')
+        if (!part.storyId) throw new Error('Part has no story')
 
         await tx
           .update(storyPart)

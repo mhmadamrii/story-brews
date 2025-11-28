@@ -1,5 +1,5 @@
-import { BookMarked, BookOpenText, Home, PencilLine, Settings } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
+import { ChartColumn, BookMarked, BookOpenText, Home, PencilLine } from 'lucide-react'
 
 import {
   Sidebar,
@@ -35,9 +35,9 @@ export function AppSidebar() {
       icon: PencilLine,
     },
     {
-      title: 'Settings',
+      title: 'Analytics',
       url: '/settings',
-      icon: Settings,
+      icon: ChartColumn,
     },
   ]
 

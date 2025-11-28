@@ -71,7 +71,7 @@ export function StoryCard({ story }: StoryCardProps) {
         <div className="flex items-center gap-2">
           <Heart className="h-4 w-4 transition-colors fill-destructive text-destructive" />
           <div className="flex flex-col">
-            <span className="text-sm font-semibold text-foreground">{30}</span>
+            <span className="text-sm font-semibold text-foreground">{story.likes}</span>
           </div>
         </div>
         <div className="flex items-center gap-2">

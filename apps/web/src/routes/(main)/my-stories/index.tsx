@@ -33,9 +33,9 @@ function RouteComponent() {
           id: item.id,
           title: item.title,
           synopsis: item.synopsis,
-          impressions: 30,
+          impressions: item.impression ?? 0,
           likes: item.likes ?? 0,
-          parts: 2,
+          parts: item.partsCount,
           readingTimeMinutes: 20,
         }))
         .map((story) => (

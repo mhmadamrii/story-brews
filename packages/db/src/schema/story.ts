@@ -19,6 +19,7 @@ export const stories = pgTable('stories', {
   likes: integer('likes').default(0),
   synopsis: text('synopsis').notNull(),
   image: varchar('image', { length: 255 }).default(''),
+  impression: integer('impression').default(0),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 })
