@@ -1,9 +1,23 @@
 import { Link } from '@tanstack/react-router'
-import { ChartColumn, BookMarked, BookOpenText, Home, PencilLine } from 'lucide-react'
+import { Avatar, AvatarFallback } from '@story-brew/ui/components/ui/avatar'
+import {
+  ChartColumn,
+  BookMarked,
+  BookOpenText,
+  Home,
+  PencilLine,
+  ChevronsUpDown,
+  LogOut,
+  Sparkles,
+  BadgeCheck,
+  CreditCard,
+  Bell,
+} from 'lucide-react'
 
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -11,6 +25,16 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@story-brew/ui/components/animate-ui/components/radix/sidebar'
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@story-brew/ui/components/animate-ui/primitives/radix/dropdown-menu'
 
 export function AppSidebar() {
   const items = [
@@ -62,6 +86,29 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      <SidebarFooter>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton
+                  size="lg"
+                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+                >
+                  <Avatar className="h-8 w-8 rounded-lg">
+                    <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                  </Avatar>
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate font-semibold">user</span>
+                    <span className="truncate text-xs">user@gmail.com</span>
+                  </div>
+                  <ChevronsUpDown className="ml-auto size-4" />
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+            </DropdownMenu>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
     </Sidebar>
   )
 }

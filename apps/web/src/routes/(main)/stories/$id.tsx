@@ -1,5 +1,7 @@
 import { useTRPC } from '@/utils/trpc'
+import { DialogNextPart } from './-components/dialog-next-part'
 import { AlertDeletePart } from './-components/alert-delete-part'
+
 import { Card, CardContent, CardHeader, CardTitle } from '@story-brew/ui/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@story-brew/ui/components/ui/avatar'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
@@ -45,6 +47,7 @@ function RouteComponent() {
   const [currentPartIndex, setCurrentPartIndex] = useState(0)
   const [editingPartId, setEditingPartId] = useState<string | null>(null)
   const [editingContent, setEditingContent] = useState('')
+  const [isOpenDialogNextPart, setIsOpenDialogNextPart] = useState(false)
 
   const { data: story } = useQuery(
     trpc.storyRouter.getStoryById.queryOptions({
@@ -227,16 +230,25 @@ function RouteComponent() {
                       {story?.user.id === session?.user.id && !editingPartId && (
                         <div className="flex justify-end gap-5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                           {idx + 1 == story.parts.length && (
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <button className="cursor-pointer">
-                                  <FilePlus2Icon size={15} className="text-muted-foreground" />
-                                </button>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>Add next part</p>
-                              </TooltipContent>
-                            </Tooltip>
+                            <DialogNextPart
+                              isOpen={isOpenDialogNextPart}
+                              onOpenChange={setIsOpenDialogNextPart}
+                              storyId={story.id}
+                            >
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <button
+                                    onClick={() => setIsOpenDialogNextPart(true)}
+                                    className="cursor-pointer"
+                                  >
+                                    <FilePlus2Icon size={15} className="text-muted-foreground" />
+                                  </button>
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p>Add next part</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </DialogNextPart>
                           )}
                           <AlertDeletePart onConfirm={() => deleteStoryPart({ id: part.id })}>
                             <button className="cursor-pointer">

@@ -27,6 +27,7 @@
     "dotenv": "catalog:",
     "zod": "catalog:",
     "@story-brew/auth": "workspace:*",
-    "@story-brew/db": "workspace:*"
+    "@story-brew/db": "workspace:*",
+    "@story-brew/ai": "workspace:*"
   }
 }

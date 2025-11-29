@@ -44,3 +44,29 @@ The story:\n${story}\n\nPlease provide a concise synopsis of the story in ${lang
 
   return response
 }
+
+export async function generateNextPart({
+  storyContext,
+  userInstruction,
+  lang,
+}: {
+  storyContext: string
+  userInstruction: string
+  lang: 'en' | 'id'
+}) {
+  const systemPrompt = `You are a professional story writer.
+Your client wants to write the next part of a story.
+
+The story so far:
+${storyContext}
+
+User instructions for the next part:
+${userInstruction}
+
+Language: ${lang}
+
+Please write the next part of the story based on the context and instructions. Provide ONLY the story content for the next part.`
+
+  const result = await gemini(systemPrompt)
+  return result.text
+}
