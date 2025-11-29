@@ -96,16 +96,6 @@ export default function TipTapEditor({
         </div>
       ) : (
         <section className="flex flex-col gap-4 p-0">
-          <div className="flex h-[60px] w-full items-center justify-end">
-            {isPending ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <div className="flex items-center gap-2">
-                <CheckCheck className="h-4 w-4 text-green-500" />
-                <span className="text-muted-foreground text-[12px]">Saved</span>
-              </div>
-            )}
-          </div>
           <RichTextEditor
             // @ts-expect-error
             editorRef={editorRef}

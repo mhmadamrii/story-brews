@@ -1,6 +1,6 @@
 import { EditorClient } from '@story-brew/editor'
 import { Button } from '@story-brew/ui/components/ui/button'
-import { ChevronLeft } from 'lucide-react'
+import { ChevronLeft, File, Sparkles } from 'lucide-react'
 import { Suspense } from 'react'
 
 export function CreativeMode({
@@ -29,11 +29,19 @@ export function CreativeMode({
 
           <h1 className="text-lg font-semibold text-foreground">Creative Mode</h1>
         </div>
-        {onSave && (
-          <Button onClick={onSave} className="cursor-pointer">
-            Save
+
+        <div className="flex items-center gap-2">
+          <Button variant="secondary" className="flex items-center gap-2 cursor-pointer">
+            <Sparkles />
+            Re-generate
           </Button>
-        )}
+          {onSave && (
+            <Button onClick={onSave} className="cursor-pointer flex items-center gap-2">
+              <File />
+              Save
+            </Button>
+          )}
+        </div>
       </div>
 
       <Suspense fallback={<div className="h-[300px] w-full">Loading...</div>}>

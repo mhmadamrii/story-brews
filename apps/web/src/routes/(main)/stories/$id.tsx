@@ -1,4 +1,5 @@
 import { useTRPC } from '@/utils/trpc'
+import { AlertDeletePart } from './-components/alert-delete-part'
 import { Card, CardContent, CardHeader, CardTitle } from '@story-brew/ui/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@story-brew/ui/components/ui/avatar'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
@@ -11,6 +12,7 @@ import { useState } from 'react'
 import { Tabs, TabsList, TabsTrigger } from '@story-brew/ui/components/ui/tabs'
 import { Button } from '@story-brew/ui/components/ui/button'
 import { motion, AnimatePresence } from 'motion/react'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@story-brew/ui/components/ui/tooltip'
 
 import {
   BookOpen,
@@ -21,8 +23,9 @@ import {
   Pencil,
   Copy,
   Trash,
+  Plus,
+  FilePlus2Icon,
 } from 'lucide-react'
-import { AlertDeletePart } from './-components/alert-delete-part'
 
 export const Route = createFileRoute('/(main)/stories/$id')({
   component: RouteComponent,
@@ -196,7 +199,7 @@ function RouteComponent() {
                   'sm:w-[100%]': editingPartId,
                 })}
               >
-                {story?.parts.map((part) => {
+                {story?.parts.map((part, idx) => {
                   if (!part) return null
                   return (
                     <div
@@ -224,6 +227,18 @@ function RouteComponent() {
                       )}
                       {story?.user.id === session?.user.id && !editingPartId && (
                         <div className="flex justify-end gap-5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                          {idx + 1 == story.parts.length && (
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <button className="cursor-pointer">
+                                  <FilePlus2Icon size={15} className="text-muted-foreground" />
+                                </button>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p>Add next part</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          )}
                           <AlertDeletePart onConfirm={() => deleteStoryPart({ id: part.id })}>
                             <button className="cursor-pointer">
                               <Trash size={15} className="text-muted-foreground" />
