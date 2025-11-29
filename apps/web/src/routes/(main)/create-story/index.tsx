@@ -235,6 +235,8 @@ function RouteComponent() {
     synopsis.length > 0 &&
     contentParts[currentPartIndex].content.length > 0
 
+  const shouldDisableConfig = currentPartIndex > 0 && contentParts[0].content.length > 0
+
   return (
     <section className="w-full px-4 py-6">
       <HeaderAction>
@@ -247,53 +249,59 @@ function RouteComponent() {
           Publish
         </Button>
       </HeaderAction>
-      {!isCreativeMode && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 relative">
-          <div id="left-section" className="lg:col-span-4 space-y-6 sticky">
-            <ReadinessIndicator
-              checks={[
-                {
-                  label: 'Select Category',
-                  isValid: selectedCategory !== 0,
-                },
-                {
-                  label: 'Add Story Blocks',
-                  isValid: (storyBlocks?.length || 0) > 0,
-                  onClick: () => setIsOpen(true),
-                },
-                {
-                  label: 'Select Language',
-                  isValid: true,
-                  onClick: () => setLang('en'),
-                },
-                {
-                  label: 'Custom Context (Optional)',
-                  isValid: true,
-                },
-                {
-                  label: 'Story Title',
-                  isValid: title.length > 0,
-                },
-                {
-                  label: 'Story Synopsis',
-                  isValid: synopsis.length > 0,
-                },
-                {
-                  label: 'Cover Image',
-                  isValid: !!coverImage,
-                },
-                {
-                  label: 'Generated Content',
-                  isValid: contentParts[currentPartIndex].content.length > 0,
-                },
-              ]}
-            />
-            <Card>
-              <CardHeader>
-                <CardTitle>Story Configuration</CardTitle>
-                <CardDescription>Setup your story parameters</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
+      <div
+        className={cn('grid grid-cols-1 lg:grid-cols-12 gap-6 relative', {
+          hidden: isCreativeMode,
+        })}
+      >
+        <div id="left-section" className="lg:col-span-4 space-y-6 sticky">
+          <ReadinessIndicator
+            checks={[
+              {
+                label: 'Select Category',
+                isValid: selectedCategory !== 0,
+              },
+              {
+                label: 'Add Story Blocks',
+                isValid: (storyBlocks?.length || 0) > 0,
+                onClick: () => setIsOpen(true),
+              },
+              {
+                label: 'Select Language',
+                isValid: true,
+                onClick: () => setLang('en'),
+              },
+              {
+                label: 'Custom Context (Optional)',
+                isValid: true,
+              },
+              {
+                label: 'Story Title',
+                isValid: title.length > 0,
+              },
+              {
+                label: 'Story Synopsis',
+                isValid: synopsis.length > 0,
+              },
+              {
+                label: 'Cover Image',
+                isValid: !!coverImage,
+              },
+              {
+                label: 'Generated Content',
+                isValid: contentParts[currentPartIndex].content.length > 0,
+              },
+            ]}
+          />
+          <Card>
+            <CardHeader>
+              <CardTitle>Story Configuration</CardTitle>
+              <CardDescription>Setup your story parameters</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div
+                className={cn('space-y-6', shouldDisableConfig && 'pointer-events-none opacity-50')}
+              >
                 <div className="space-y-3">
                   <Label>Category</Label>
                   <div className="grid grid-cols-2 gap-2">
@@ -393,141 +401,146 @@ function RouteComponent() {
                     />
                   </div>
                 </div>
+              </div>
 
-                <div className="pt-2">
-                  <Button
-                    disabled={!selectedCategory || !storyBlocks?.length || isGenerating}
-                    onClick={handleGenerate}
-                    className="w-full cursor-pointer flex items-center justify-center gap-2"
-                    size="lg"
-                  >
-                    {isGenerating ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      'Generate Story Part'
-                    )}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-          <div className="lg:col-span-8 space-y-6">
-            <Card className="h-full">
-              <CardHeader>
-                <CardTitle>Story Editor</CardTitle>
-                <CardDescription>Write and edit your story content</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="space-y-2">
-                  <Label className="text-lg font-semibold">Story Title</Label>
-                  <Input
-                    className="text-lg font-medium h-10"
-                    placeholder="Enter your story title..."
-                    value={title}
-                    onChange={(e) => setTitleState(e.target.value)}
-                  />
-                </div>
+              <div className="pt-2">
+                <Button
+                  disabled={
+                    (!selectedCategory || !storyBlocks?.length || isGenerating) &&
+                    !shouldDisableConfig
+                  }
+                  onClick={handleGenerate}
+                  className="w-full cursor-pointer flex items-center justify-center gap-2"
+                  size="lg"
+                >
+                  {isGenerating ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : shouldDisableConfig ? (
+                    `Generate Part ${currentPartIndex + 1}`
+                  ) : (
+                    'Generate Story Part'
+                  )}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+        <div className="lg:col-span-8 space-y-6">
+          <Card className="h-full">
+            <CardHeader>
+              <CardTitle>Story Editor</CardTitle>
+              <CardDescription>Write and edit your story content</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-2">
+                <Label className="text-lg font-semibold">Story Title</Label>
+                <Input
+                  className="text-lg font-medium h-10"
+                  placeholder="Enter your story title..."
+                  value={title}
+                  onChange={(e) => setTitleState(e.target.value)}
+                />
+              </div>
 
-                <div className="border rounded-md p-4 bg-muted/10">
-                  <StoryPart
-                    contentParts={contentParts}
-                    setContentParts={setContentParts}
-                    currentPartIndex={currentPartIndex}
-                    setCurrentPartIndex={setCurrentPartIndex}
-                    onActivateCreativeMode={setIsCreativeMode}
-                  />
-                </div>
+              <div className="border rounded-md p-4 bg-muted/10">
+                <StoryPart
+                  contentParts={contentParts}
+                  setContentParts={setContentParts}
+                  currentPartIndex={currentPartIndex}
+                  setCurrentPartIndex={setCurrentPartIndex}
+                  onActivateCreativeMode={setIsCreativeMode}
+                />
+              </div>
 
-                <div className="flex items-start gap-4">
-                  <div className="flex-1 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Label>Synopsis</Label>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-6 text-xs"
-                        onClick={handleGenerateSynopsis}
-                      >
-                        Auto-generate
-                      </Button>
-                    </div>
-                    <Textarea
-                      value={synopsis}
-                      onChange={(e) => setSynopsis(e.target.value)}
-                      placeholder="Story synopsis..."
-                      className="min-h-[100px]"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
+              <div className="flex items-start gap-4">
+                <div className="flex-1 space-y-2">
                   <div className="flex items-center justify-between">
-                    <Label>Cover Image</Label>
+                    <Label>Synopsis</Label>
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-6 text-xs gap-1"
-                      onClick={handleGenerateCover}
-                      disabled={!synopsis || isGeneratingCover}
+                      className="h-6 text-xs"
+                      onClick={handleGenerateSynopsis}
                     >
-                      {isGeneratingCover ? (
-                        <Loader2 className="h-3 w-3 animate-spin" />
-                      ) : (
-                        <RefreshCw className="h-3 w-3" />
-                      )}
-                      Generate Cover
-                    </Button>
-                    <input
-                      type="file"
-                      ref={fileInputRef}
-                      className="hidden"
-                      accept="image/*"
-                      onChange={handleFileChange}
-                    />
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="h-6 text-xs gap-1"
-                      onClick={handleUploadClick}
-                      disabled={isUploading || isGeneratingCover}
-                    >
-                      {isUploading ? (
-                        <Loader2 className="h-3 w-3 animate-spin" />
-                      ) : (
-                        <Upload className="h-3 w-3" />
-                      )}
-                      Upload
+                      Auto-generate
                     </Button>
                   </div>
-
-                  {coverImage ? (
-                    <div className="relative aspect-video w-full overflow-hidden rounded-md border bg-muted">
-                      <img
-                        src={coverImage}
-                        alt="Story cover"
-                        className="h-full w-full object-cover"
-                      />
-                      <Button
-                        variant="destructive"
-                        size="icon"
-                        className="absolute right-2 top-2 h-8 w-8"
-                        onClick={() => setCoverImage(null)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="flex aspect-video w-full flex-col items-center justify-center rounded-md border border-dashed bg-muted/50 text-muted-foreground">
-                      <ImageIcon className="mb-2 h-8 w-8 opacity-50" />
-                      <p className="text-xs">No cover image generated</p>
-                    </div>
-                  )}
+                  <Textarea
+                    value={synopsis}
+                    onChange={(e) => setSynopsis(e.target.value)}
+                    placeholder="Story synopsis..."
+                    className="min-h-[100px]"
+                  />
                 </div>
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label>Cover Image</Label>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-6 text-xs gap-1"
+                    onClick={handleGenerateCover}
+                    disabled={!synopsis || isGeneratingCover}
+                  >
+                    {isGeneratingCover ? (
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                    ) : (
+                      <RefreshCw className="h-3 w-3" />
+                    )}
+                    Generate Cover
+                  </Button>
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    className="hidden"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-6 text-xs gap-1"
+                    onClick={handleUploadClick}
+                    disabled={isUploading || isGeneratingCover}
+                  >
+                    {isUploading ? (
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                    ) : (
+                      <Upload className="h-3 w-3" />
+                    )}
+                    Upload
+                  </Button>
+                </div>
+
+                {coverImage ? (
+                  <div className="relative aspect-video w-full overflow-hidden rounded-md border bg-muted">
+                    <img
+                      src={coverImage}
+                      alt="Story cover"
+                      className="h-full w-full object-cover"
+                    />
+                    <Button
+                      variant="destructive"
+                      size="icon"
+                      className="absolute right-2 top-2 h-8 w-8"
+                      onClick={() => setCoverImage(null)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex aspect-video w-full flex-col items-center justify-center rounded-md border border-dashed bg-muted/50 text-muted-foreground">
+                    <ImageIcon className="mb-2 h-8 w-8 opacity-50" />
+                    <p className="text-xs">No cover image generated</p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </div>
-      )}
+      </div>
       {isCreativeMode && (
         <CreativeMode
           initialValue={contentParts[currentPartIndex].content}

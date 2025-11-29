@@ -23,7 +23,6 @@ import {
   Pencil,
   Copy,
   Trash,
-  Plus,
   FilePlus2Icon,
 } from 'lucide-react'
 
