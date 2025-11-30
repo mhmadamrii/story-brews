@@ -1,4 +1,5 @@
 import { Button } from '@story-brew/ui/components/ui/button'
+import { generateNextPart } from '@story-brew/ai/gemini-story'
 import { Textarea } from '@story-brew/ui/components/ui/textarea'
 import { useState } from 'react'
 import { useTRPC } from '@/utils/trpc'
@@ -19,32 +20,55 @@ interface DialogNextPartProps {
   storyId: string
   children: React.ReactNode
   isOpen: boolean
+  currentPart: string
   onOpenChange: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-export function DialogNextPart({ storyId, children, isOpen, onOpenChange }: DialogNextPartProps) {
+export function DialogNextPart({
+  storyId,
+  children,
+  isOpen,
+  currentPart,
+  onOpenChange,
+}: DialogNextPartProps) {
+  console.log('currentPart', currentPart)
   const [instruction, setInstruction] = useState('')
+  const [isPending, setIsPending] = useState(false)
 
   const trpc = useTRPC()
   const queryClient = useQueryClient()
 
-  const { mutate: generateNextPart, isPending } = useMutation(
-    trpc.storyRouter.generateNextPart.mutationOptions({
-      onSuccess: () => {
-        toast.success('Next part generated successfully!')
-        queryClient.invalidateQueries(trpc.storyRouter.getStoryById.queryOptions({ id: storyId }))
-        onOpenChange(false)
-        setInstruction('')
-      },
-      onError: (error) => {
-        toast.error(error.message || 'Failed to generate next part')
-      },
-    })
-  )
+  // const { mutate: generateNextPart, isPending } = useMutation(
+  //   trpc.aiRouter.generateNextPart.mutationOptions({
+  //     onSuccess: () => {
+  //       toast.success('Next part generated successfully!')
+  //       queryClient.invalidateQueries(trpc.storyRouter.getStoryById.queryOptions({ id: storyId }))
+  //       onOpenChange(false)
+  //       setInstruction('')
+  //     },
+  //     onError: (error) => {
+  //       toast.error(error.message || 'Failed to generate next part')
+  //     },
+  //   })
+  // )
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     if (!instruction.trim()) return
-    generateNextPart({ storyId, userInstruction: instruction })
+    setIsPending(true)
+    try {
+      const res = await generateNextPart({
+        lang: 'id',
+        storyContext: currentPart,
+        userInstruction: instruction,
+      })
+
+      console.log('response', res)
+    } catch (error) {
+      console.log('error', error)
+    } finally {
+      setIsPending(false)
+    }
+    // generateNextPart({ storyId, userInstruction: instruction })
   }
 
   return (

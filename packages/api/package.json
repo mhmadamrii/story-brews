@@ -21,13 +21,14 @@
     "typescript": "^5"
   },
   "dependencies": {
-    "@trpc/server": "catalog:",
-    "@trpc/client": "catalog:",
-    "hono": "catalog:",
-    "dotenv": "catalog:",
-    "zod": "catalog:",
+    "@types/pg": "^8.15.6",
+    "@story-brew/ai": "workspace:*",
     "@story-brew/auth": "workspace:*",
     "@story-brew/db": "workspace:*",
-    "@story-brew/ai": "workspace:*"
+    "@trpc/client": "catalog:",
+    "@trpc/server": "catalog:",
+    "dotenv": "catalog:",
+    "hono": "catalog:",
+    "zod": "catalog:"
   }
 }

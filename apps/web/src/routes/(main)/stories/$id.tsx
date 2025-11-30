@@ -118,10 +118,10 @@ function RouteComponent() {
                     alt={story.title}
                     className="w-full h-full object-cover opacity-40"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
+                  <div className="absolute inset-0 bg-linear-to-t from-black/90 via-black/50 to-transparent" />
                 </>
               ) : (
-                <div className="w-full h-full bg-gradient-to-br from-purple-900/90 via-blue-900/90 to-indigo-900/90" />
+                <div className="w-full h-full bg-linear-to-br from-purple-900/90 via-blue-900/90 to-indigo-900/90" />
               )}
               <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-12">
                 <motion.div
@@ -198,7 +198,7 @@ function RouteComponent() {
             <div className="space-y-4 flex gap-4 relative">
               <div
                 className={cn('w-full sm:w-[70%]', {
-                  'sm:w-[100%]': editingPartId,
+                  'sm:w-full': editingPartId,
                 })}
               >
                 {story?.parts.map((part, idx) => {
@@ -227,13 +227,14 @@ function RouteComponent() {
                           <ReadOnlyEditor initialValue={part.content ?? ''} />
                         </div>
                       )}
-                      {story?.user.id === session?.user.id && !editingPartId && (
+                      {story?.user?.id === session?.user.id && !editingPartId && (
                         <div className="flex justify-end gap-5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                           {idx + 1 == story.parts.length && (
                             <DialogNextPart
                               isOpen={isOpenDialogNextPart}
                               onOpenChange={setIsOpenDialogNextPart}
-                              storyId={story.id}
+                              storyId={story.id ?? ''}
+                              currentPart={story.parts[idx]?.content ?? ''}
                             >
                               <Tooltip>
                                 <TooltipTrigger asChild>

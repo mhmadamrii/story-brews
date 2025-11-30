@@ -1,9 +1,9 @@
 import { db, eq } from '@story-brew/db'
 import { user } from '@story-brew/db/schema/auth'
 import { stories } from '@story-brew/db/schema/story'
-import { protectedProcedure } from '..'
+import { protectedProcedure, router } from '..'
 
-export const userRouter = {
+export const userRouter = router({
   getAllAuthors: protectedProcedure.query(async () => {
     const authors = await db
       .selectDistinct({
@@ -16,4 +16,4 @@ export const userRouter = {
 
     return authors
   }),
-}
+})

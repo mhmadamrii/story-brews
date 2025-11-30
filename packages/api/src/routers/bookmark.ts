@@ -1,11 +1,11 @@
 import z from 'zod'
 
 import { and, db, eq } from '@story-brew/db'
-import { protectedProcedure } from '..'
+import { protectedProcedure, router } from '..'
 import { bookmark, stories } from '@story-brew/db/schema/story'
 import { user } from '@story-brew/db/schema/auth'
 
-export const bookmarkRouter = {
+export const bookmarkRouter = router({
   getAllBookmarks: protectedProcedure.query(({ ctx }) => {
     return db
       .select({
@@ -46,4 +46,4 @@ export const bookmarkRouter = {
         return { bookmarked: true }
       }
     }),
-}
+})

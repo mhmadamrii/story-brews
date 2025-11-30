@@ -20,7 +20,7 @@ export function StoryBlockDialog({
   storyBlocksLength,
 }: {
   isOpen: boolean
-  setIsOpen: React.Dispatch<React.SetStateAction<boolean>>
+  setIsOpen: (isOpen: boolean) => void
   storyBlocksLength: number
 }) {
   const queryClient = useQueryClient()

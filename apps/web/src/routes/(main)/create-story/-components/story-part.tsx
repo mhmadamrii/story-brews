@@ -1,46 +1,22 @@
-'use no memo'
-
 import { Button } from '@story-brew/ui/components/ui/button'
+import { useCreateStoryContext } from '../-context/create-story-context'
 import { CircleX, PencilLine, Plus } from 'lucide-react'
 import { ScrollArea, ScrollBar } from '@story-brew/ui/components/ui/scroll-area'
 import { ReadOnlyEditor } from '@story-brew/editor/read-only-editor'
 import { Card, CardContent } from '@story-brew/ui/components/ui/card'
 import { cn } from '@story-brew/ui/lib/utils'
 
-import type { ContentPart } from '..'
+export function StoryPart() {
+  const {
+    contentParts,
+    currentPartIndex,
+    setCurrentPartIndex,
+    handleAddPart,
+    handleDeletePart,
+    setIsCreativeMode,
+  } = useCreateStoryContext()
 
-export function StoryPart({
-  contentParts,
-  currentPartIndex,
-  setContentParts,
-  setCurrentPartIndex,
-  onActivateCreativeMode,
-}: {
-  contentParts: ContentPart
-  currentPartIndex: number
-  setContentParts: React.Dispatch<React.SetStateAction<ContentPart>>
-  setCurrentPartIndex: React.Dispatch<React.SetStateAction<number>>
-  onActivateCreativeMode: React.Dispatch<React.SetStateAction<boolean>>
-}) {
   const currentPart = contentParts[currentPartIndex]
-
-  const handleAddPart = () => {
-    const newPart = {
-      id: Date.now().toString(),
-      order: contentParts.length + 1,
-      content: '',
-    }
-    const newIndex = contentParts.length
-    setContentParts([...contentParts, newPart])
-    setCurrentPartIndex(newIndex)
-  }
-
-  const handleDeletePart = (index: number) => {
-    if (contentParts.length === 1) return
-    const updatedParts = contentParts.filter((_, i) => i !== index)
-    setContentParts(updatedParts)
-    setCurrentPartIndex(Math.max(0, Math.min(currentPartIndex, updatedParts.length - 1)))
-  }
 
   return (
     <div className="w-full max-w-4xl space-y-6">
@@ -49,7 +25,7 @@ export function StoryPart({
           <label className="text-sm font-semibold text-foreground">
             Part {currentPartIndex + 1} of {contentParts.length}
           </label>
-          <Button onClick={() => onActivateCreativeMode(true)} size="icon" variant="outline">
+          <Button onClick={() => setIsCreativeMode(true)} size="icon" variant="outline">
             <PencilLine className="h-4 w-4" />
           </Button>
         </div>

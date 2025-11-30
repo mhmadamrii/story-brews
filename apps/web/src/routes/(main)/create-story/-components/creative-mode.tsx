@@ -11,7 +11,7 @@ export function CreativeMode({
 }: {
   initialValue: string
   onChange: (content: string) => void
-  onDeactivateCreativeMode: React.Dispatch<React.SetStateAction<boolean>>
+  onDeactivateCreativeMode: (isCreativeMode: boolean) => void
   onSave?: () => void
 }) {
   return (
